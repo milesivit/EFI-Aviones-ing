@@ -1,0 +1,31 @@
+# Entornos virtuales
+env/
+.venv/
+venv/
+
+# Archivos de entorno
+.env
+.env/
+
+# Archivos de base de datos
+db.sqlite3
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Archivos de instalación de paquetes
+*.egg-info/
+dist/
+build/
+
+# Git
+.git/
+
+# Archivos de sistema
+.DS_Store
+Thumbs.db
+
+# Archivos de logs
+*.log
