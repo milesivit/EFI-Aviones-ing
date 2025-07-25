@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block title %} Airplanes List {% endblock %}
+
+{% block content %}
+    <h1>Airplanes</h1>
+    <ul>
+        {% for plane in airplanes %}
+            <li>
+                Model: {{ plane.model }}<br>
+                Capacity: {{ plane.capacity }} passengers<br>
+                Rows: {{ plane.rows }} - Columns: {{ plane.columns }}
+            </li>
+        {% empty %}
+            <li>There are no airplanes.</li>
+        {% endfor %}
+    </ul>
+
+    <a href="#">Create new airplane</a>
+
+    <p>
+      <a href="/" class="btn" style="background-color: #577399; color: white; border: none;">Back</a>
+    </p>
+{% endblock %}

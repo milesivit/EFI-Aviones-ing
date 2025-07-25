@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block title %}Developers | Airline SM{% endblock %}
+
+{% block content %}
+  <div class="jumbotron">
+    <h1 class="display-8">Project Information</h1>
+    <p class="lead">This project was built as a prototype for an airline management system.</p>
+    <p class="font-weight-bold mt-4">Developers</p>
+    <ul>
+      <li>Milena Sivit</li>
+      <li>Santiago Baez</li>
+    </ul>
+    <p>
+      <a href="/" class="btn" style="background-color: #577399; color: white; border: none;">Back</a>
+    </p>
+    <hr class="my-4">
+
+    <p class="font-weight-bold">Backend Development Workflow</p>
+    <p>
+      The backend of this application was developed using Django, following a structured and modular approach.
+      We implemented the complete backend flow which includes:
+    </p>
+    <ul>
+      <li><strong>Model:</strong> Definition of the database structure.</li>
+      <li><strong>Repository:</strong> (optional layer) Encapsulation of database access logic.</li>
+      <li><strong>Service:</strong> Implementation of business logic and application rules.</li>
+      <li><strong>View:</strong> Definition of the logic to handle HTTP requests and responses.</li>
+      <li><strong>URL:</strong> Configuration of routes to connect views with accessible endpoints.</li>
+    </ul>
+    <p>
+      This separation of concerns ensures clean code, easier maintenance, and better scalability.
+    </p>
+
+    <p class="font-weight-bold mt-4">Data Models and Relationships</p>
+    <p>
+      The system models cover key entities of an airline application. Here's a brief overview:
+    </p>
+    <ul>
+      <li><strong>Plane:</strong> Represents aircrafts, with model, capacity, rows and columns.</li>
+      <li><strong>User:</strong> System users (e.g. admin, vendors) with login credentials and roles.</li>
+      <li><strong>Flight:</strong> Flights with origin, destination, timing, base price, linked to a plane and users.</li>
+      <li><strong>Passenger:</strong> Personal information of individuals booking flights.</li>
+      <li><strong>Seat:</strong> Specific seats in a plane, including row, column, type and status.</li>
+      <li><strong>Reservation:</strong> A passenger’s booking, linked to a flight, seat and passenger, with a unique code.</li>
+      <li><strong>Ticket:</strong> Issued ticket for a reservation, with barcode and issue date.</li>
+    </ul>
+    <p>
+      These models are interconnected through ForeignKey and OneToOne relations, ensuring data consistency and efficient retrieval.
+    </p>
+
+    <p class="font-weight-bold mt-4">Technologies used: Django, Bootstrap 4, HTML5, CSS3</p>
+  </div>
+{% endblock %}
