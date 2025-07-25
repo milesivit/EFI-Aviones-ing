@@ -1,2 +1,19 @@
+{% extends 'base.html' %}
+{% load static %}
 
-{% block title %} Home {% endblock %}
+{% block title %} Welcome to Airline SM {% endblock %}
+
+{% block content %}
+<div class="hero d-flex flex-wrap align-items-center justify-content-between py-5">
+  <div class="hero-content col-md-6 mb-4">
+    <h1 class="display-4">Welcome to Airline SM</h1>
+    <p class="lead">Fly with comfort, safety, and style. Your journey begins here.</p>
+    <p>
+      <a href="{% url 'dev' %}" class="btn"  style="background-color: #577399; color: white; border: none;">Project Information</a>
+    </p>
+  </div>
+  <div class="hero-illustration col-md-3 text-center">
+    <img src="{% static 'img/smavion.png' %}" alt="Airplane" class="img-fluid hero-plane" />
+  </div>
+</div>
+{% endblock %}
