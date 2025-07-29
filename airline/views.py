@@ -2,19 +2,55 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 from django.urls import reverse_lazy
 from django.views import View
-from django.views.generic import DetailView, ListView, DeleteView, UpdateView
-from airline.models import User
 from airline.services.user import UserService
 from airline.services.plane import PlaneService
-
-
-# Función para listar usuarios
-def user_list(request):
-    users = UserService.get_all()
-    return render(request, 'users/list.html', {'users': users})
+from home.forms import RegisterForm, LoginForm
+from django.contrib.auth import authenticate, login
 
 # Función para listar aviones
 def plane_list(request):
     airplanes = PlaneService.get_all()  
     return render(request, 'plane/list.html', {'airplanes': airplanes})
 
+
+
+# --------------------------------------------------------------------USUARIOS
+# Función para listar usuarios
+def user_list(request):
+    users = UserService.get_all()
+    return render(request, 'users/list.html', {'users': users})
+
+# Registrar un nuevo usuario
+# segun las buenas practicas para las password va desde el modelo, repositorio, service, form y luego la view con su respectiva url
+def user_register(request):
+    if request.method == 'POST':
+        form = RegisterForm(request.POST)
+        if form.is_valid(): # si el form es valido entonces
+            form.save()  # llama a UserService.create() desde el form y se guarda
+            messages.success(request, "Usuario creado correctamente.") 
+            return redirect('user_list')
+        else: #sino error
+            messages.error(request, "Por favor corrige los errores del formulario.")
+    else:
+        form = RegisterForm()
+    return render(request, 'accounts/register.html', {'form': form})
+
+def user_login(request):
+    if request.method == 'POST':
+        form = LoginForm(request.POST)
+        if form.is_valid():
+            username = form.cleaned_data.get("username")
+            password = form.cleaned_data.get("password")
+
+            user = authenticate(request, username=username, password=password)
+
+            if user is not None:
+                login(request, user)
+                messages.success(request, f"Bienvenido/a {user.username}")
+                return redirect('index')  # Cambia 'index' por la vista que desees como home/logueado
+            else:
+                messages.error(request, "Credenciales inválidas. Intenta nuevamente.")
+    else:
+        form = LoginForm()
+
+    return render(request, 'accounts/login.html', {'form': form})

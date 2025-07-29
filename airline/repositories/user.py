@@ -26,7 +26,7 @@ class UserRepository:
         Returns:
             Instancia del usuario creado.
         """
-        return User.objects.create(
+        return User.objects.create_user(
             username=username,
             password=password,
             email=email,
@@ -75,7 +75,7 @@ class UserRepository:
             Instancia del usuario actualizada.
         """
         user.username = username
-        user.password = password
+        user.set_password(password)
         user.email = email
         user.role = role
         user.save()
