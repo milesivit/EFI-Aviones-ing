@@ -1,3 +1,4 @@
+from django.contrib.auth.hashers import make_password
 from airline.models import User
 from airline.repositories.user import UserRepository
 
@@ -8,14 +9,20 @@ class UserService:
         username: str,
         password: str,
         email: str,
-        role: str,
+        role: str
     ) -> User:
-        return UserRepository.create(
+        user = UserRepository.create(
             username=username,
             password=password,
             email=email,
-            role=role,
+            role=role
         )
+
+        if role == 'admin':
+            user.is_staff = True
+            user.save()
+
+        return user
 
     @staticmethod
     def delete(user_id: int) -> bool:
@@ -28,26 +35,27 @@ class UserService:
     def update(
         user_id: int,
         username: str,
-        password: int,
-        email: int,
-        role: int,
+        password: str,
+        email: str,
+        role: str,
     ) -> bool:
         user = UserRepository.get_by_id(user_id=user_id)
         if user:
-            UserRepository.update(
+            return UserRepository.update(
                 user=user,
                 username=username,
                 password=password,
                 email=email,
-                role=role,
+                role=role
             )
+        return False
 
     @staticmethod
     def get_all() -> list[User]:
         return UserRepository.get_all() 
     
     @staticmethod
-    def get_by_id(user_id: int) -> list[User]:
+    def get_by_id(user_id: int) -> User:
         if user_id:
             return UserRepository.get_by_id(user_id=user_id)
         return ValueError("El Usuario No Existe")
