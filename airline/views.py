@@ -4,6 +4,7 @@ from django.urls import reverse_lazy
 from django.views import View
 from airline.services.user import UserService
 from airline.services.plane import PlaneService
+from airline.services.flight import FlightService
 from home.forms import RegisterForm, LoginForm
 from django.contrib.auth import authenticate, login
 
@@ -11,8 +12,6 @@ from django.contrib.auth import authenticate, login
 def plane_list(request):
     airplanes = PlaneService.get_all()  
     return render(request, 'plane/list.html', {'airplanes': airplanes})
-
-
 
 # --------------------------------------------------------------------USUARIOS
 # Función para listar usuarios
@@ -25,10 +24,11 @@ def user_list(request):
 def user_register(request):
     if request.method == 'POST':
         form = RegisterForm(request.POST)
-        if form.is_valid(): # si el form es valido entonces
-            form.save()  # llama a UserService.create() desde el form y se guarda
-            messages.success(request, "Usuario creado correctamente.") 
-            return redirect('user_list')
+        if form.is_valid():
+            user = form.save()  # guardás y obtenés el objeto usuario
+            login(request, user)  # iniciás sesión automáticamente
+            messages.success(request, "Usuario creado correctamente.")
+            return redirect('index')
         else: #sino error
             messages.error(request, "Por favor corrige los errores del formulario.")
     else:
@@ -54,3 +54,7 @@ def user_login(request):
         form = LoginForm()
 
     return render(request, 'accounts/login.html', {'form': form})
+
+def flight_list(request):
+    flights = FlightService.get_all()
+    return render(request, 'flights/list.html', {'flights': flights})

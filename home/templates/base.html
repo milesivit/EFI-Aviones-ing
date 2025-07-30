@@ -25,7 +25,7 @@
         {% if user.is_authenticated %}
           <ul class="navbar-nav ml-auto">
             <li class="nav-item">
-              <a class="nav-link btn-custom" href="{% url 'plane_list' %}">Flights</a>
+              <a class="nav-link btn-custom" href="{% url 'flight_list' %}">Flights</a>
             </li>
             <li class="nav-item">
               <a class="nav-link btn-custom" href="#">Help</a>
@@ -40,7 +40,7 @@
           {% else %}
           <ul class="navbar-nav ml-auto">
             <li class="nav-item">
-              <a class="nav-link btn-custom" href="{% url 'user_login' %}"">Sign In</a>
+              <a class="nav-link btn-custom" href="{% url 'user_login' %}">Sign In</a>
             </li>
             <li class="nav-item">
               <a class="nav-link btn-custom" href="{% url 'user_register' %}">Register</a>

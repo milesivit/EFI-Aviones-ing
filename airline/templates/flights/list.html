@@ -1,0 +1,34 @@
+{% extends 'base.html' %} 
+
+{% block title %}Vuelos{% endblock %}
+
+{% block content %}
+<html>
+<head>
+    <title>Lista de Vuelos</title>
+</head>
+{% if request.user.is_staff %}
+    <button>Hola</button>
+{% endif %}
+<body>
+    <h1>Vuelos</h1>
+    <ul>
+        {% for flight in flights %}
+        <li>
+            Origen: {{ flight.origin }}<br>
+            Destino: {{ flight.destination }}<br>
+            Salida: {{ flight.departure_date }}<br>
+            Llegada: {{ flight.arrival_date }}<br>
+            Duración: {{ flight.duration }}<br>
+            Precio: {{ flight.base_price }}<br>
+            Estado: {{ flight.status }}<br>
+            Avion: {{flight.plane.model}}
+        </li>
+        {% empty %}
+            <li>No hay vuelos.</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
+
+{% endblock %}
