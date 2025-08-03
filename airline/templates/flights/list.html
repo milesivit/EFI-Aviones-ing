@@ -7,11 +7,11 @@
 <head>
     <title>Lista de Vuelos</title>
 </head>
-{% if request.user.is_staff %}
-    <button>Hola</button>
-{% endif %}
 <body>
     <h1>Vuelos</h1>
+    {% if request.user.is_staff %}
+        <a class="btn" style="background-color: #577399; color: white; border: none;" href="{% url 'flight_administration' %}">Administrar Vuelos</a>
+    {% endif %}
     <ul>
         {% for flight in flights %}
         <li>

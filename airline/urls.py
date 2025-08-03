@@ -6,7 +6,7 @@ from airline.views import (
     user_register,
     user_login,
     flight_list,
-
+    flight_administration,
 )
 
 urlpatterns = [
@@ -31,4 +31,9 @@ urlpatterns = [
         view=flight_list,
         name='flight_list',
     ),
+    path(
+        route='flights/flight_administration/',
+        view=flight_administration,
+        name='flight_administration',
+    )
 ]
