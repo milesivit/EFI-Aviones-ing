@@ -1,0 +1,169 @@
+{% extends 'base.html' %}
+
+{% block title %}Administrador de Vuelos{% endblock %}
+
+{% block content %}
+    <div class="d-flex justify-content-center mb-4">
+        <h1>ADMINISTRADOR DE VUELOS</h1>
+    </div>
+
+    <div class="container-fluid">
+        <div class="row">
+
+            <!-- Modal de creación -->
+            <div class="modal fade {% if form_errors %}show d-block{% endif %}" 
+                 id="createFlightModal" 
+                 tabindex="-1" 
+                 aria-labelledby="createFlightLabel" 
+                 aria-hidden="true" 
+                 {% if form_errors %}style="background-color: rgba(0,0,0,.5);"{% endif %}>
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header bg-primary text-white">
+                            <h5 class="modal-title" id="createFlightLabel">Agregar nuevo vuelo</h5>
+                            <button type="button" class="btn-close btn-close-dark" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                        </div>
+                        <form method="post">
+                            {% csrf_token %}
+                            <div class="modal-body">
+                                {{ form.as_p }}
+                            </div>
+                            <div class="modal-footer">
+                                <button type="submit" name="action" value="create" class="btn btn-primary">Guardar Vuelo</button>
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabla de vuelos -->
+            <div class="col-12 bg-success p-3">
+                <h2>Tabla de Vuelos</h2>
+
+                <div class="col-12 mb-3 p-3" style="background-color: rgb(0, 255, 0);">
+                    <!-- Botones -->
+                    <button type="button" class="btn btn-light" data-bs-toggle="modal" data-bs-target="#createFlightModal">
+                        Agregar nuevo vuelo
+                    </button>
+                    <a href="{% url 'plane_list' %}" class="btn btn-light">Flota de Aviones</a>
+                </div>
+
+                <table class="table table-striped table-bordered table-hover">
+                    <thead>
+                        <tr>
+                            <th>Vuelo</th>
+                            <th>Origen</th>
+                            <th>Destino</th>
+                            <th>Fecha de Salida</th>
+                            <th>Fecha de Llegada</th>
+                            <th>Duración</th>
+                            <th>Precio</th>
+                            <th>Estado</th>
+                            <th>Avión</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for flight in flights %}
+                            <tr>
+                                <td>{{ flight.id }}</td>
+                                <td>{{ flight.origin }}</td>
+                                <td>{{ flight.destination }}</td>
+                                <td>{{ flight.departure_date }}</td>
+                                <td>{{ flight.arrival_date }}</td>
+                                <td>{{ flight.duration }}</td>
+                                <td>{{ flight.base_price }}</td>
+                                <td>{{ flight.status }}</td>
+                                <td>{{ flight.plane.model }}</td>
+                                <td>
+                                    <!-- Botón Editar -->
+                                    <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#updateFlightModal{{ flight.id }}">
+                                        Editar
+                                    </button>
+
+                                    <!-- Botón Eliminar -->
+                                    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal{{ flight.id }}">
+                                        Eliminar
+                                    </button>
+
+                                    <!-- Modal de confirmación de eliminación -->
+                                    <div class="modal fade" id="confirmDeleteModal{{ flight.id }}" tabindex="-1" aria-labelledby="confirmDeleteLabel{{ flight.id }}" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="confirmDeleteLabel{{ flight.id }}">Confirmar eliminación</h5>
+                                                    <button type="button" class="btn-close btn-close-dark" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    ¿Estás seguro que querés eliminar este vuelo?
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                                    <form method="POST" style="display:inline;">
+                                                        {% csrf_token %}
+                                                        <input type="hidden" name="action" value="delete">
+                                                        <input type="hidden" name="flight_id" value="{{ flight.id }}">
+                                                        <button type="submit" class="btn btn-danger">Eliminar</button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="10" class="text-center">No hay vuelos disponibles.</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modales de edición para cada vuelo -->
+    {% for flight, form in update_form %}
+        <div class="modal fade {% if update_errors and update_flight_id == flight.id|stringformat:'s' %}show d-block{% endif %}"
+             id="updateFlightModal{{ flight.id }}" tabindex="-1" 
+             aria-labelledby="updateFlightLabel{{ flight.id }}" aria-hidden="true"
+             {% if update_errors and update_flight_id == flight.id|stringformat:'s' %}style="background-color: rgba(0,0,0,.5);"{% endif %}>
+
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title" id="updateFlightLabel{{ flight.id }}">Editar vuelo #{{ flight.id }}</h5>
+                        <button type="button" class="btn-close btn-close-dark" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                    </div>
+                    <form method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="flight_id" value="{{ flight.id }}">
+                        <div class="modal-body">
+                            {{ form.as_p }}
+                        </div>
+                        <div class="modal-footer">
+                            <button type="submit" name="action" value="update" class="btn btn-primary">Guardar</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+
+    <!-- Scripts para mostrar los modales si hay errores -->
+    {% if form_errors %}
+        <script>
+            var createModal = new bootstrap.Modal(document.getElementById('createFlightModal'));
+            createModal.show();
+        </script>
+    {% endif %}
+
+    {% if update_errors and update_flight_id %}
+        <script>
+            var updateModal = new bootstrap.Modal(document.getElementById('updateFlightModal{{ update_flight_id }}'));
+            updateModal.show();
+        </script>
+    {% endif %}
+{% endblock %}

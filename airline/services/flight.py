@@ -1,5 +1,3 @@
-#Revisar
-
 from airline.models import Flight
 from airline.repositories.flight import FlightRepository
 

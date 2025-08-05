@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+
+{% block title %}Detalles del Avión{% endblock %}
+
+{% block content %}
+<h2>Layout de asientos para el avión: {{ plane.model }}</h2>
+
+<!-- Contenedor principal: layout + info -->
+<div style="display: flex; justify-content: center; align-items: flex-start; gap: 30px;">
+
+    <!-- Bloque izquierdo: layout con etiquetas -->
+    <div>
+
+        <!-- Parte delantera -->
+        <div style="text-align: center; padding: 10px; writing-mode: horizontal-tb;">
+            <strong>Cabina / Parte Delantera</strong>
+        </div>
+
+        <div style="display: flex;">
+
+            <!-- Ventana izquierda -->
+            <div style="writing-mode: vertical-rl; text-align: center; padding: 10px;">
+                <strong>Ventana Izquierda</strong>
+            </div>
+
+            <!-- Layout de asientos -->
+            <div style="display: inline-block; padding: 10px; background-color: #f0f0f0; border-radius: 10px;">
+                {% for row in seat_matrix %}
+                    <div style="display: flex; justify-content: center; margin-bottom: 6px;">
+                        {% for seat, clase in row %}
+                            {% if seat == "PASILLO" %}
+                                <div style="width: 20px;"></div>
+                            {% else %}
+                                <button 
+                                    style="
+                                        width: 45px; 
+                                        height: 45px; 
+                                        margin: 2px; 
+                                        border-radius: 6px;
+                                        font-weight: bold;
+                                        background-color: {% if clase == 'first' %}gold{% else %}lightgray{% endif %};
+                                    ">
+                                    {{ seat }}
+                                </button>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                {% endfor %}
+            </div>
+
+            <!-- Ventana derecha -->
+            <div style="writing-mode: vertical-rl; text-align: center; padding: 10px;">
+                <strong>Ventana Derecha</strong>
+            </div>
+        </div>
+
+        <!-- Parte trasera -->
+        <div style="text-align: center; padding: 10px; writing-mode: horizontal-tb;">
+            <strong>Zona de Carga / Parte Trasera</strong>
+        </div>
+
+    </div>
+
+    <!-- Info técnica del avión -->
+    <div style="min-width: 220px; max-width: 300px; padding: 10px; background-color: #e6f2ff; border-left: 6px solid #3399cc; border-radius: 4px;">
+        <p><strong>Modelo:</strong> {{ plane.model }}</p>
+        <p><strong>Capacidad:</strong> {{ plane.capacity }}</p>
+        <p><strong>Filas:</strong> {{ plane.rows }}</p>
+        <p><strong>Columnas:</strong> {{ plane.columns }}</p>
+    </div>
+
+</div>
+
+<!-- Botón de volver -->
+<p style="margin-top: 20px;">
+  <a href="/planes/" class="btn" style="background-color: #577399; color: white; border: none;">Volver</a>
+</p>
+{% endblock %}

@@ -45,15 +45,21 @@ class User(AbstractBaseUser, PermissionsMixin):
     def __str__(self):
         return self.username
     
+class FlightStatus(models.Model):
+    status = models.CharField(max_length=100)
+
+    def __str__(self):
+        return f"{self.status}"
+    
 class Flight(models.Model): #clase vuelo
     origin = models.CharField(max_length=100) #origen
     destination = models.CharField(max_length=100)
     departure_date = models.DateTimeField() #fecha salida
     arrival_date = models.DateTimeField() #fecha llegada
     duration = models.DurationField() #duracion, durationfield permite calcular facilmente diferencias entre fechas
-    status = models.CharField(max_length=50) #estado
     base_price = models.DecimalField(max_digits=10, decimal_places=2) #precio base
 
+    status = models.ForeignKey(FlightStatus, on_delete=models.CASCADE) #estado id
     plane = models.ForeignKey(Plane, on_delete=models.CASCADE) #avion id
     user = models.ManyToManyField(User)
 
