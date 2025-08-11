@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block title %}Help - Basic User Guide{% endblock %}
+
+{% block content %}
+<div class="hero d-flex flex-wrap align-items-center justify-content-between py-5">
+  <div class="hero-content col-md-6 mb-4">
+    <h1 class="display-4">Help</h1>
+    <p class="lead">Fly with comfort, safety, and style. Your journey begins here.</p>
+    <p>
+      <a href="{% url 'dev' %}" class="btn"  style="background-color: #577399; color: white; border: none;">Project Information</a>
+    </p>
+  </div>
+</div>
+
+<div style="position:relative; padding-bottom:56.25%; height:0; overflow:hidden; max-width:100%; margin-top: 2rem;">
+  <iframe src="https://www.youtube.com/embed/iaoV9T2ey74" 
+          style="position:absolute; top:0; left:0; width:70%; height:70%;" 
+          frameborder="0" allowfullscreen 
+          title="YouTube video player"></iframe>
+</div>
+
+</div>
+{% endblock %}

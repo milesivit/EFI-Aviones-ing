@@ -8,9 +8,19 @@ from airline.views import (
     user_login,
     flight_list,
     flight_administration,
+    edit_user,
+    help_view
 )
 
 urlpatterns = [
+    path('help/', 
+         view=help_view, 
+         name='help_view'),
+    path(
+        route='users/edit/<int:user_id>/',
+        view=edit_user,
+        name='edit_user'
+    ),
     path(
         route='users/',
         view=user_list,

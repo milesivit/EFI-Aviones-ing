@@ -1,9 +1,9 @@
-/* Logo */
 a.logo img {
-  width: 100px;
-  height: auto;
-  margin-left: 0;
+  width: 500px !important;
+  height: auto !important;
+  max-width: none !important; /* evita que Bootstrap la limite */
 }
+
 
 a.logo {
   padding-left: 0;

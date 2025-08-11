@@ -148,12 +148,48 @@ def plane_detail(request, plane_id):
         'seat_matrix': seat_matrix,
     })
 
+#------------------------------------------------------------------
+#help
+
+def help_view(request):
+    return render(request, 'help/help.html')
 
 # --------------------------------------------------------------------
 # Función para listar usuarios (sin cambios)
 def user_list(request):
     users = UserService.get_all()
     return render(request, 'users/list.html', {'users': users})
+
+from django.contrib.auth import update_session_auth_hash
+
+def edit_user(request, user_id):
+    user = UserService.get_by_id(user_id)
+
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        email = request.POST.get('email')
+        password = request.POST.get('password')
+
+        if not password:
+            password = None  
+
+        UserService.update(
+            user_id=user_id,
+            username=username,
+            password=password,
+            email=email,
+            role=user.role,
+        )
+        
+        # Refrescar sesión para mantener autenticación
+        # Volvemos a obtener el usuario actualizado:
+        updated_user = UserService.get_by_id(user_id)
+        update_session_auth_hash(request, updated_user)  # IMPORTANTE
+
+        return redirect('/')
+
+    return render(request, 'users/edit_user.html', {'user': user})
+
 
 
 # --------------------------------------------------------------------
