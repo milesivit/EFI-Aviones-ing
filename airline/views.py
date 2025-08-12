@@ -13,6 +13,7 @@ from airline.services.user import UserService
 from airline.services.plane import PlaneService
 from airline.services.flight import FlightService
 from airline.services.passenger import PassengerService
+from airline.services.flight_status import FlightStatusService
 from airline.forms import CreateFlightForm, UpdateFlightForm, CreatePlaneForm, UpdatePlaneForm, PassengerForm
 from home.forms import RegisterForm, LoginForm
 
@@ -22,17 +23,25 @@ from django.shortcuts import get_object_or_404
 from .models import FlightStatus
 import json
 
-@csrf_exempt
-def flight_status_list(request):
-    if request.method == 'GET':
-        statuses = list(FlightStatus.objects.values())
-        return JsonResponse(statuses, safe=False)
-    
+def add_status_flight(request):
     if request.method == 'POST':
-        data = json.loads(request.body)
-        status = data.get('status')
-        new_status = FlightStatus.objects.create(status=status)
-        return JsonResponse({"id": new_status.id, "status": new_status.status})
+        status = request.POST.get('status', '').strip()
+
+        if not status:
+            messages.error(request, "El campo 'Estado' es obligatorio.")
+            return redirect('add_status_flight')  # O volver a la misma página
+
+        try:
+            FlightStatusService.create(status=status)
+            messages.success(request, f"Estado '{status}' creado correctamente.")
+            return redirect('flight_status_list')  # Redirigir a la lista de estados
+        except Exception as e:
+            messages.error(request, f"No se pudo crear el estado: {str(e)}")
+            return redirect('add_status_flight')
+
+    # Si es GET, renderizamos el formulario
+    return render(request, 'flight_status/add_status_flight.html')
+
 # --------------------------------------------------------------------
 #passengers 
 

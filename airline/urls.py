@@ -10,7 +10,7 @@ from airline.views import (
     flight_administration,
     edit_user,
     help_view,
-    flight_status_list,
+    add_status_flight,
     add_passenger,
     select_seat
 )
@@ -18,8 +18,8 @@ from airline.views import (
 urlpatterns = [
     path(
         route='flightstatus/',
-        view=flight_status_list,
-        name='flight_status_list'
+        view=add_status_flight,
+        name='add_status_flight'
     ),
     path('flights/<int:flight_id>/add-passenger/', 
          view=add_passenger, 

@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Agregar Estado de Vuelo</h2>
+
+<form method="post">
+    {% csrf_token %}
+    <div class="mb-3">
+        <label for="status" class="form-label">Estado</label>
+        <input type="text" class="form-control" id="status" name="status" placeholder="Ej: En vuelo">
+    </div>
+    <button type="submit" class="btn btn-primary">Guardar</button>
+</form>
+{% endblock %}

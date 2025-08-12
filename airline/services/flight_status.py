@@ -3,12 +3,8 @@ from airline.repositories.flight_status import FlightStatusRepository
 
 class FlightStatusService:
     @staticmethod
-    def create(
-        status: str,
-    ):
-        return FlightStatus.create(
-            status=status,
-        )
+    def create(status: str):
+          return FlightStatus.objects.create(status=status)
     
     @staticmethod
     def delete(flight_status_id: int) -> bool:
