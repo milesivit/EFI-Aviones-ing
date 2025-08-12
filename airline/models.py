@@ -68,6 +68,14 @@ class Flight(models.Model): #clase vuelo
     
 
 class Passenger(models.Model):
+    PASSPORT = 'passport'
+    DNI = 'dni'
+    ID_CARD = 'id_card'
+    DOCUMENT_TYPE_CHOICES = [
+        (PASSPORT, 'Passport'),
+        (DNI, 'DNI'),
+        (ID_CARD, 'ID Card'),
+    ]
     name = models.CharField(max_length=255) #nombre
     document = models.CharField(max_length=50) #documento
     document_type = models.CharField(max_length=50) #tipo de documento

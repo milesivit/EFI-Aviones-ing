@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block title %}Add passenger{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <h2>Reservar vuelo: {{ flight.origin }} → {{ flight.destination }}</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Confirmar Reserva</button>
+    </form>
+</div>
+{% endblock %}

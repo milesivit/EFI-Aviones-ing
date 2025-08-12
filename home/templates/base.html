@@ -19,7 +19,7 @@
     <nav class="navbar navbar-expand-lg navbar-dark bg-blue">
       <div class="container-fluid">
         <a class="logo" href="/">
-          <img src="{% static 'img/smlogo.png' %}" alt="" />
+          <img src="{% static 'img/logo3.png' %}" alt="" />
         </a>
 
         {% if user.is_authenticated %}
@@ -28,10 +28,10 @@
               <a class="nav-link btn-custom" href="{% url 'flight_list' %}">Flights</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link btn-custom" href="#">Help</a>
+              <a class="nav-link btn-custom" href="{% url 'help_view' %}">Help</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link btn-custom" href="#">My profile</a>
+              <a class="nav-link btn-custom" href="{% url 'edit_user' user.id %}">My profile</a>
             </li>
             <li class="nav-item">
               <a class="nav-link btn-custom text-danger" href="{% url 'logout' %}">Logout</a>

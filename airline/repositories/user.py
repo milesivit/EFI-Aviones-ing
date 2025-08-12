@@ -61,26 +61,15 @@ class UserRepository:
         email: str,
         role: str
     ) -> User:
-        """
-        Actualiza los datos de un usuario.
-
-        Args:
-            user: Instancia del usuario a actualizar.
-            username: Nuevo nombre de usuario.
-            password: Nueva contraseña.
-            email: Nuevo correo electrónico.
-            role: Nuevo rol.
-
-        Returns:
-            Instancia del usuario actualizada.
-        """
         user.username = username
-        user.set_password(password)
+        if password:  # <-- solo actualizo si password tiene contenido
+            user.set_password(password)
         user.email = email
         user.role = role
         user.save()
 
         return user
+
 
     @staticmethod
     def get_all() -> list[User]:
