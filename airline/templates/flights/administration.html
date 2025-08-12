@@ -6,19 +6,19 @@
 <div class="container my-4">
 
     <div class="d-flex justify-content-center mb-4">
-        <h1 style="color: #577399; font-weight: 700;">ADMINISTRADOR DE VUELOS</h1>
+        <h1 style="color: #577399; font-weight: 700;">Flight manager</h1>
     </div>
 
     <!-- Botones superiores -->
     <div class="mb-3 d-flex gap-2">
         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createFlightModal" style="background-color: #577399; border: none;">
-            Add new flight
+            Add New Flight
         </button>
-        <a href="{% url 'plane_list' %}" class="btn btn-secondary" style="background-color: #bb2525; border: none;">
+        <a href="{% url 'plane_list' %}" class="btn btn-secondary" style="background-color: #577399; border: none;">
             Plane Fleet
         </a>
-        <a href="{% url 'add_status_flight' %}" class="btn btn-secondary" style="background-color: #bb2525; border: none;">
-            Create Plane Status
+        <a href="{% url 'add_status_flight' %}" class="btn btn-secondary" style="background-color: #577399; border: none;">
+            Create Flight Status
         </a>
     </div>
 

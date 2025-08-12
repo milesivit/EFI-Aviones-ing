@@ -12,10 +12,16 @@ from airline.views import (
     help_view,
     add_status_flight,
     add_passenger,
-    select_seat
+    select_seat,
+    confirm_reservation,
 )
 
 urlpatterns = [
+    path(
+        route='flights/<int:flight_id>/passenger/<int:passenger_id>/seat/<int:seat_id>/confirm/',
+        view=confirm_reservation,
+        name='confirm_reservation'
+    ),
     path(
         route='flightstatus/',
         view=add_status_flight,

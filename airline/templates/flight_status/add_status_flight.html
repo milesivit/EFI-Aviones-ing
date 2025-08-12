@@ -5,10 +5,16 @@
 
 <form method="post">
     {% csrf_token %}
+    
     <div class="mb-3">
         <label for="status" class="form-label">Estado</label>
         <input type="text" class="form-control" id="status" name="status" placeholder="Ej: En vuelo">
     </div>
-    <button type="submit" class="btn btn-primary">Guardar</button>
+    
+    <div class="d-flex gap-2 mt-3">
+        <button type="submit" class="btn btn-primary">Guardar</button>
+        <a href="/flights/flight_administration" class="btn btn-secondary">Volver</a>
+    </div>
+
 </form>
 {% endblock %}

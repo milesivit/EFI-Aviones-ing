@@ -2,56 +2,88 @@
 {% block title %}Seleccionar Asiento{% endblock %}
 
 {% block content %}
-<div class="container my-4">
+<h2 class="text-center mb-4" style="color: #577399; font-weight: 700;">
+    Select a seat for the flight {{ flight.id }}
+</h2>
 
-    <h2 class="text-center mb-4" style="color: #577399; font-weight: 700;">
-        Select a seat for the flight {{ flight.id }}
-    </h2>
+<div style="display: flex; justify-content: center; align-items: flex-start; gap: 30px;">
 
-    <form method="post" class="d-flex justify-content-center">
+    <!-- Formulario que incluye todo: asientos + info + botón aceptar -->
+    <form method="post" style="display: flex; gap: 30px; align-items: flex-start;">
         {% csrf_token %}
-        <div class="bg-light p-4 rounded shadow-sm" style="max-width: 600px;">
+        <input type="hidden" name="seat_id" id="selected-seat">
 
-            {% for row in seat_matrix %}
-                <div class="d-flex justify-content-center mb-2">
-                    {% for seat in row %}
-                        {% if seat %}
-                            <button 
-                                name="seat_id" 
-                                value="{{ seat.id }}" 
-                                type="submit"
-                                class="btn btn-sm me-1"
-                                style="
-                                    width: 48px; 
-                                    height: 48px; 
-                                    font-weight: 600;
-                                    border-radius: 8px;
-                                    {% if seat.status == 'available' %}
-                                        background-color: #4CAF50;
-                                        color: white;
-                                        cursor: pointer;
-                                    {% elif seat.status == 'Taken' %}
-                                        background-color: #F44336;
-                                        color: white;
-                                        cursor: not-allowed;
-                                    {% else %}
-                                        background-color: #B0BEC5;
-                                        color: #37474F;
-                                        cursor: not-allowed;
-                                    {% endif %}
-                                "
-                                {% if seat.status != 'available' %} disabled {% endif %}
-                                title="Asiento {{ seat.number }} - {{ seat.seat_type|title }}"
-                            >
-                                {{ seat.number }}
-                            </button>
-                        {% else %}
-                            <div style="width: 48px; height: 48px; margin-right: 6px;"></div>
-                        {% endif %}
+        <!-- Layout de asientos -->
+        <div>
+            <!-- Parte delantera -->
+            <div style="text-align: center; padding: 10px;">
+                <strong>Cabina / Parte Delantera</strong>
+            </div>
+
+            <div style="display: flex;">
+
+                <!-- Ventana izquierda -->
+                <div style="writing-mode: vertical-rl; text-align: center; padding: 10px;">
+                    <strong>Ventana Izquierda</strong>
+                </div>
+
+                <!-- Asientos -->
+                <div style="display: inline-block; padding: 10px; background-color: #f0f0f0; border-radius: 10px;">
+                    {% for row in seat_matrix %}
+                        <div style="display: flex; justify-content: center; margin-bottom: 6px;">
+                            {% for seat in row %}
+                                {% if seat == "PASILLO" %}
+                                    <div style="width: 20px;"></div>
+                                {% elif seat %}
+                                    <button 
+                                        type="button"
+                                        class="seat-btn"
+                                        data-seat-id="{{ seat.id }}"
+                                        style="
+                                            width: 45px; 
+                                            height: 45px; 
+                                            margin: 2px; 
+                                            border-radius: 6px;
+                                            font-weight: bold;
+                                            {% if seat.status == 'available' %}
+                                                background-color: #4CAF50;
+                                                color: white;
+                                                cursor: pointer;
+                                            {% elif seat.status == 'Taken' %}
+                                                background-color: #F44336;
+                                                color: white;
+                                                cursor: not-allowed;
+                                            {% else %}
+                                                background-color: #B0BEC5;
+                                                color: #37474F;
+                                                cursor: not-allowed;
+                                            {% endif %}
+                                        "
+                                        {% if seat.status != 'available' %} disabled {% endif %}
+                                        title="Asiento {{ seat.number }} - {{ seat.seat_type|title }}"
+                                    >
+                                        {{ seat.number }}
+                                    </button>
+                                {% else %}
+                                    <div style="width: 45px; height: 45px; margin: 2px;"></div>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
                     {% endfor %}
                 </div>
-            {% endfor %}
 
+                <!-- Ventana derecha -->
+                <div style="writing-mode: vertical-rl; text-align: center; padding: 10px;">
+                    <strong>Ventana Derecha</strong>
+                </div>
+            </div>
+
+            <!-- Parte trasera -->
+            <div style="text-align: center; padding: 10px;">
+                <strong>Zona de Carga / Parte Trasera</strong>
+            </div>
+
+            <!-- Leyenda -->
             <div class="mt-3 text-center">
                 <small>
                     <span class="badge bg-success me-2">&nbsp;</span> Available
@@ -59,12 +91,36 @@
                     <span class="badge bg-secondary ms-3 me-2">&nbsp;</span> Not assignable
                 </small>
             </div>
+        </div>
 
+        <!-- Info del vuelo + botón aceptar -->
+        <div style="min-width: 220px; max-width: 300px; padding: 10px; background-color: #e6f2ff; border-left: 6px solid #3399cc; border-radius: 4px; display: flex; flex-direction: column; align-items: center; gap: 1rem;">
+            <div>
+                <p><strong>Vuelo:</strong> {{ flight.id }}</p>
+                <p><strong>Avión:</strong> {{ flight.plane.model }}</p>
+                <p><strong>Capacidad:</strong> {{ flight.plane.capacity }}</p>
+            </div>
+
+            <div class="text-center" style="width: 100%;">
+                <button type="submit" class="btn btn-primary w-100" id="confirm-btn" disabled>
+                    Aceptar
+                </button>
+            </div>
         </div>
     </form>
 
-    <div class="mt-4 text-center">
-        <a href="{% url 'flight_list' %}" class="btn btn-outline-secondary">Return to flights</a>
-    </div>
 </div>
+
+<script>
+    document.querySelectorAll('.seat-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.getElementById('selected-seat').value = btn.dataset.seatId;
+
+            document.querySelectorAll('.seat-btn').forEach(b => b.style.outline = '');
+            btn.style.outline = '3px solid #FFD700';
+
+            document.getElementById('confirm-btn').disabled = false;
+        });
+    });
+</script>
 {% endblock %}

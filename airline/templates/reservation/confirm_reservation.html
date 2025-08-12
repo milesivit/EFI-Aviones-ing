@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Confirmar Reserva</h2>
+
+<div>
+    <h4>Información del Vuelo</h4>
+    <p>Origen: {{ flight.origin }}</p>
+    <p>Destino: {{ flight.destination }}</p>
+    <p>Fecha de salida: {{ flight.departure_date }}</p>
+    <p>Fecha de llegada: {{ flight.arrival_date }}</p>
+</div>
+
+<div>
+    <h4>Información del Pasajero</h4>
+    <p>Nombre: {{ passenger.name }}</p>
+    <p>DNI: {{ passenger.document }}</p>
+</div>
+
+<div>
+    <h4>Asiento seleccionado</h4>
+    <p>Fila: {{ seat.row }}</p>
+    <p>Columna: {{ seat.column }}</p>
+    <p>Tipo: {{ seat.seat_type }}</p>
+</div>
+<form method="post">
+    {% csrf_token %}
+    <button type="submit" name="action" value="confirm_reservation" class="btn btn-success">Confirmar Reserva</button>
+</form>
+
+{% endblock %}

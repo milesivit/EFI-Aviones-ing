@@ -2,10 +2,8 @@
 import string
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
-from django.urls import reverse_lazy
-from django.views import View
 from django.contrib.auth import authenticate, login
-from airline.models import Reservation, Passenger
+from airline.models import Reservation, Passenger, Ticket
 
 # Importaciones internas de la aplicación (modelos, servicios y formularios)
 from airline.models import Flight, Plane, Seat
@@ -13,15 +11,68 @@ from airline.services.user import UserService
 from airline.services.plane import PlaneService
 from airline.services.flight import FlightService
 from airline.services.passenger import PassengerService
+from airline.services.reservation import ReservationService
+from airline.services.ticket import TicketService
 from airline.services.flight_status import FlightStatusService
 from airline.forms import CreateFlightForm, UpdateFlightForm, CreatePlaneForm, UpdatePlaneForm, PassengerForm
 from home.forms import RegisterForm, LoginForm
-
-from django.http import JsonResponse, HttpResponse
-from django.views.decorators.csrf import csrf_exempt
+from datetime import datetime
+import random
+import string
 from django.shortcuts import get_object_or_404
-from .models import FlightStatus
-import json
+import random
+import string
+from datetime import datetime
+
+#------------------------------------------------------------------------
+
+from django.shortcuts import redirect
+
+def confirm_reservation(request, flight_id, passenger_id, seat_id):
+    flight = get_object_or_404(Flight, id=flight_id)
+    passenger = get_object_or_404(Passenger, id=passenger_id)
+    seat = get_object_or_404(Seat, id=seat_id)
+
+    if request.method == 'POST':
+        seat.status = 'taken'
+        seat.save()
+
+        reservation_code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=8))
+        price = flight.base_price
+
+        reservation = ReservationService.create(
+            status='confirmed',
+            reservation_date=datetime.now(),
+            price=price,
+            reservation_code=reservation_code,
+            flight_id=flight.id,
+            passenger_id=passenger.id,
+            seat_id=seat.id,
+        )
+
+        barcode = ''.join(random.choices(string.ascii_uppercase + string.digits, k=12))
+        issue_date = datetime.now()
+        status = 'active'
+
+        ticket = TicketService.create(
+            barcode=barcode,
+            issue_date=issue_date,
+            status=status,
+            reservation_id=reservation.id,
+        )
+
+        request.session['ticket_id'] = ticket.id
+
+        # Redirigir a la lista de vuelos
+        return redirect('flight_list')  
+
+    return render(request, 'reservation/confirm_reservation.html', {
+        'flight': flight,
+        'passenger': passenger,
+        'seat': seat,
+    })
+#-----------------------------------------------------------------------------------
+#flight status
 
 def add_status_flight(request):
     if request.method == 'POST':
@@ -39,7 +90,6 @@ def add_status_flight(request):
             messages.error(request, f"No se pudo crear el estado: {str(e)}")
             return redirect('add_status_flight')
 
-    # Si es GET, renderizamos el formulario
     return render(request, 'flight_status/add_status_flight.html')
 
 # --------------------------------------------------------------------
@@ -63,9 +113,6 @@ def add_passenger(request, flight_id):
                 birth_date=cd['birth_date'],
             )
 
-            # Aquí podés crear la reserva, asignar asiento, etc.
-
-            # Por ahora, redirijo a lista vuelos, podés cambiar a donde quieras
             return redirect('select_seat', flight_id=flight.id, passenger_id=passenger.id)
 
     else:
@@ -81,11 +128,9 @@ def select_seat(request, flight_id, passenger_id):
 
     seats = Seat.objects.filter(plane=plane).order_by('row', 'column')
 
-    # Crear matriz de asientos por fila y columna, con "PASILLO" en el medio (ejemplo)
     max_row = plane.rows
     max_column = plane.columns
 
-    # Supongo que las columnas son letras 'A', 'B', 'C', ...
     columns = [chr(ord('A') + i) for i in range(max_column)]
 
     seat_dict = {(seat.row, seat.column): seat for seat in seats}
@@ -98,20 +143,17 @@ def select_seat(request, flight_id, passenger_id):
             if seat:
                 row_seats.append(seat)
             else:
-                row_seats.append(None)  # espacio vacío o pasillo
+                row_seats.append(None) 
         seat_matrix.append(row_seats)
 
     if request.method == 'POST':
         seat_id = request.POST.get('seat_id')
         seat = get_object_or_404(Seat, id=seat_id, plane=plane, status='available')
 
-        # Crear reserva o actualizarla (tu lógica)
-        # Reservation.objects.create(flight=flight, passenger_id=passenger_id, seat=seat)
-
         seat.status = 'Taken'
         seat.save()
 
-        return redirect('flight_list')
+        return redirect('confirm_reservation', flight_id=flight.id, passenger_id=passenger_id, seat_id=seat.id)
 
     return render(request, 'seat/select_seat.html', {
         'flight': flight,
@@ -120,13 +162,11 @@ def select_seat(request, flight_id, passenger_id):
     })
 
 #-----------------------------------------------------------------
-# Función para listar aviones y manejar creación, actualización y eliminación
 def create_seats_for_plane(plane):
     seat_types = ['first_class', 'business', 'economico']  # Lista de tipos
     columns = [chr(ord('A') + i) for i in range(plane.columns)]
     seats = []
     for row in range(1, plane.rows + 1):
-        # Elegir tipo según fila, o cualquier otra regla
         if row <= 2:
             seat_type = 'first_class'
         elif row <= 5:
