@@ -2,10 +2,75 @@ from datetime import timedelta
 from django import forms
 from django.forms.widgets import DateTimeInput
 from django.core.exceptions import ValidationError
+from datetime import date
 from django.contrib.auth import authenticate
-from airline.models import Flight, FlightStatus, Plane
+from airline.models import Flight, FlightStatus, Plane, Passenger, Reservation
 from airline.services.flight import FlightService
 
+class PassengerForm(forms.Form):
+    name = forms.CharField(
+        label="Name",
+        max_length=255,
+        widget=forms.TextInput(
+            attrs={'class': 'form-control'}
+        )
+    )
+    document = forms.CharField(
+        label="Document",
+        max_length=50,
+        widget=forms.TextInput(
+            attrs={'class': 'form-control'}
+        )
+    )
+    document_type = forms.ChoiceField(
+        label="Document Type",
+        choices=Passenger.DOCUMENT_TYPE_CHOICES, 
+        widget=forms.Select(
+            attrs={'class': 'form-control'}
+        )
+    )
+    email = forms.EmailField(
+        label="Email",
+        widget=forms.EmailInput(
+            attrs={'class': 'form-control'}
+        )
+    )
+    phone = forms.CharField(
+        label="Phone",
+        max_length=20,
+        widget=forms.TextInput(
+            attrs={'class': 'form-control'}
+        )
+    )
+    birth_date = forms.DateField(
+        label="Birth Date",
+        widget=forms.DateInput(
+            attrs={'class': 'form-control', 'type': 'date'}
+        )
+    )
+
+    def clean_birth_date(self):
+        birth_date = self.cleaned_data.get('birth_date')
+        if birth_date and birth_date > date.today():
+            raise ValidationError("Birth date cannot be in the future.")
+        return birth_date
+    
+    def __init__(self, *args, flight_id=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.flight_id = flight_id  # guardo el vuelo para validar
+
+    def clean_document(self):
+        document = self.cleaned_data.get('document')
+        if document and Passenger.objects.filter(document=document).exists():
+            raise ValidationError("Ya existe un pasajero registrado con este documento.")
+        return document
+
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        if email and Passenger.objects.filter(email=email).exists():
+            raise ValidationError("Ya existe un pasajero registrado con este email.")
+        return email
+    
 class CreateFlightForm(forms.Form):
     origin = forms.CharField(
         max_length=150,

@@ -9,10 +9,21 @@ from airline.views import (
     flight_list,
     flight_administration,
     edit_user,
-    help_view
+    help_view,
+    flight_status_list,
+    add_passenger,
+    select_seat
 )
 
 urlpatterns = [
+    path(
+        route='flightstatus/',
+        view=flight_status_list,
+        name='flight_status_list'
+    ),
+    path('flights/<int:flight_id>/add-passenger/', 
+         view=add_passenger, 
+         name='add_passenger'),
     path('help/', 
          view=help_view, 
          name='help_view'),
@@ -20,6 +31,11 @@ urlpatterns = [
         route='users/edit/<int:user_id>/',
         view=edit_user,
         name='edit_user'
+    ),
+    path(
+        route='flights/<int:flight_id>/passengers/<int:passenger_id>/select-seat/',
+        view=select_seat,
+        name='select_seat'
     ),
     path(
         route='users/',

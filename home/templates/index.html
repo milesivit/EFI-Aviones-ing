@@ -64,8 +64,17 @@
 
     <!-- Botón buscar -->
     <div class="form-group mb-2 ml-auto">
-      <button type="button" class="btn btn-danger px-4" style="font-weight: 600;">Search</button>
+      {% if user.is_authenticated %}
+        <a href="{% url 'flight_list' %}" class="btn btn-danger px-4" style="font-weight: 600;">
+          Search
+        </a>
+      {% else %}
+        <a href="{% url 'user_register' %}" class="btn btn-danger px-4" style="font-weight: 600;">
+          Search
+        </a>
+      {% endif %}
     </div>
+
 
   </form>
 

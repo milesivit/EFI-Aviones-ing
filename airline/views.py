@@ -5,18 +5,138 @@ from django.contrib import messages
 from django.urls import reverse_lazy
 from django.views import View
 from django.contrib.auth import authenticate, login
+from airline.models import Reservation, Passenger
 
 # Importaciones internas de la aplicación (modelos, servicios y formularios)
-from airline.models import Flight, Plane
+from airline.models import Flight, Plane, Seat
 from airline.services.user import UserService
 from airline.services.plane import PlaneService
 from airline.services.flight import FlightService
-from airline.forms import CreateFlightForm, UpdateFlightForm, CreatePlaneForm, UpdatePlaneForm  # Agregá UpdatePlaneForm si no lo tenés
+from airline.services.passenger import PassengerService
+from airline.forms import CreateFlightForm, UpdateFlightForm, CreatePlaneForm, UpdatePlaneForm, PassengerForm
 from home.forms import RegisterForm, LoginForm
 
+from django.http import JsonResponse, HttpResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.shortcuts import get_object_or_404
+from .models import FlightStatus
+import json
 
+@csrf_exempt
+def flight_status_list(request):
+    if request.method == 'GET':
+        statuses = list(FlightStatus.objects.values())
+        return JsonResponse(statuses, safe=False)
+    
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        status = data.get('status')
+        new_status = FlightStatus.objects.create(status=status)
+        return JsonResponse({"id": new_status.id, "status": new_status.status})
 # --------------------------------------------------------------------
+#passengers 
+
+def add_passenger(request, flight_id):
+    flight = get_object_or_404(Flight, id=flight_id)
+
+    if request.method == 'POST':
+        form = PassengerForm(request.POST)
+        if form.is_valid():
+            cd = form.cleaned_data
+
+            # Crear pasajero usando el servicio
+            passenger = PassengerService.create(
+                name=cd['name'],
+                document=cd['document'],
+                document_type=cd['document_type'],
+                email=cd['email'],
+                phone=cd['phone'],
+                birth_date=cd['birth_date'],
+            )
+
+            # Aquí podés crear la reserva, asignar asiento, etc.
+
+            # Por ahora, redirijo a lista vuelos, podés cambiar a donde quieras
+            return redirect('select_seat', flight_id=flight.id, passenger_id=passenger.id)
+
+    else:
+        form = PassengerForm()
+    
+    return render(request, 'passenger/add_passenger.html', {'form': form, 'flight': flight})
+
+#---------------------------------------------------------------
+#seat
+def select_seat(request, flight_id, passenger_id):
+    flight = get_object_or_404(Flight, id=flight_id)
+    plane = flight.plane
+
+    seats = Seat.objects.filter(plane=plane).order_by('row', 'column')
+
+    # Crear matriz de asientos por fila y columna, con "PASILLO" en el medio (ejemplo)
+    max_row = plane.rows
+    max_column = plane.columns
+
+    # Supongo que las columnas son letras 'A', 'B', 'C', ...
+    columns = [chr(ord('A') + i) for i in range(max_column)]
+
+    seat_dict = {(seat.row, seat.column): seat for seat in seats}
+
+    seat_matrix = []
+    for row in range(1, max_row + 1):
+        row_seats = []
+        for col in columns:
+            seat = seat_dict.get((row, col))
+            if seat:
+                row_seats.append(seat)
+            else:
+                row_seats.append(None)  # espacio vacío o pasillo
+        seat_matrix.append(row_seats)
+
+    if request.method == 'POST':
+        seat_id = request.POST.get('seat_id')
+        seat = get_object_or_404(Seat, id=seat_id, plane=plane, status='available')
+
+        # Crear reserva o actualizarla (tu lógica)
+        # Reservation.objects.create(flight=flight, passenger_id=passenger_id, seat=seat)
+
+        seat.status = 'Taken'
+        seat.save()
+
+        return redirect('flight_list')
+
+    return render(request, 'seat/select_seat.html', {
+        'flight': flight,
+        'passenger_id': passenger_id,
+        'seat_matrix': seat_matrix,
+    })
+
+#-----------------------------------------------------------------
 # Función para listar aviones y manejar creación, actualización y eliminación
+def create_seats_for_plane(plane):
+    seat_types = ['first_class', 'business', 'economico']  # Lista de tipos
+    columns = [chr(ord('A') + i) for i in range(plane.columns)]
+    seats = []
+    for row in range(1, plane.rows + 1):
+        # Elegir tipo según fila, o cualquier otra regla
+        if row <= 2:
+            seat_type = 'first_class'
+        elif row <= 5:
+            seat_type = 'business'
+        else:
+            seat_type = 'economico'
+        
+        for col in columns:
+            seats.append(Seat(
+                number=f"{row}{col}",
+                row=row,
+                column=col,
+                seat_type=seat_type,
+                status='available',
+                plane=plane
+            ))
+    Seat.objects.bulk_create(seats)
+
+    
 def plane_list(request):
     airplanes = PlaneService.get_all()  
 
@@ -40,6 +160,7 @@ def plane_list(request):
                     columns=cd['columns'],
                 )
                 new_plane.save()
+                create_seats_for_plane(new_plane)
                 return redirect('plane_list')
             else:
                 form_errors = True
