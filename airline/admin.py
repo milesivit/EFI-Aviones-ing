@@ -1,5 +1,5 @@
 from django.contrib import admin
-from airline.models import Plane, User, Flight, Passenger, Seat, Reservation, Ticket
+from airline.models import Plane, User, Flight, FlightStatus, Passenger, Seat, Reservation, Ticket
 
 @admin.register(Plane)
 class PlaneAdmin(admin.ModelAdmin):
@@ -11,6 +11,10 @@ class UserAdmin(admin.ModelAdmin):
     list_display = ('username', 'email', 'role')
     list_filter = ('role',)
     search_fields = ('username', 'email') #barra de busqueda
+
+@admin.register(FlightStatus)
+class FlightStatusAdmin(admin.ModelAdmin):
+    list_display = ('id', 'status')
 
 @admin.register(Flight)
 class FlightAdmin(admin.ModelAdmin):
