@@ -1,24 +1,24 @@
 {% extends 'base.html' %}
 
-{% block title %}Administrador de Vuelos{% endblock %}
+{% block title %}Flight Administration{% endblock %}
 
 {% block content %}
 <div class="container my-4">
 
     <div class="d-flex justify-content-center mb-4">
-        <h1 style="color: #577399; font-weight: 700;">ADMINISTRADOR DE VUELOS</h1>
+        <h1 style="color: #577399; font-weight: 700;">Flight Administration</h1>
     </div>
 
     <!-- Botones superiores -->
     <div class="mb-3 d-flex gap-2">
         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createFlightModal" style="background-color: #577399; border: none;">
-            Add new flight
+            Add New Flight
         </button>
-        <a href="{% url 'plane_list' %}" class="btn btn-secondary" style="background-color: #bb2525; border: none;">
-            Plane Fleet
+        <a href="{% url 'add_status_flight' %}" class="btn btn-secondary" style="background-color: #577399; border: none;">
+            Create Flight Status
         </a>
-        <a href="{% url 'add_status_flight' %}" class="btn btn-secondary" style="background-color: #bb2525; border: none;">
-            Create Plane Status
+        <a href="{% url 'plane_list' %}" class="btn btn-secondary" style="background-color: #577399; border: none;">
+            Plane Fleet
         </a>
     </div>
 
@@ -53,10 +53,10 @@
                         <td>{{ flight.plane.model }}</td>
                         <td>
                             <button type="button" class="btn btn-warning btn-sm me-1" data-bs-toggle="modal" data-bs-target="#updateFlightModal{{ flight.id }}">
-                                Editar
+                                Edit <i class="bi bi-pencil"></i>
                             </button>
                             <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal{{ flight.id }}">
-                                Eliminar
+                                Delete <i class="bi bi-trash3"></i>
                             </button>
 
                             <!-- Modal de confirmación de eliminación -->
@@ -64,19 +64,19 @@
                                 <div class="modal-dialog">
                                     <div class="modal-content">
                                         <div class="modal-header bg-danger text-white">
-                                            <h5 class="modal-title" id="confirmDeleteLabel{{ flight.id }}">Confirmar eliminación</h5>
+                                            <h5 class="modal-title" id="confirmDeleteLabel{{ flight.id }}">Confirm deletion</h5>
                                             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                                         </div>
                                         <div class="modal-body">
-                                            ¿Estás seguro que querés eliminar este vuelo?
+                                            Are you sure you want to delete this flight?
                                         </div>
                                         <div class="modal-footer">
-                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                                             <form method="POST" style="display:inline;">
                                                 {% csrf_token %}
                                                 <input type="hidden" name="action" value="delete">
                                                 <input type="hidden" name="flight_id" value="{{ flight.id }}">
-                                                <button type="submit" class="btn btn-danger">Eliminar</button>
+                                                <button type="submit" class="btn btn-danger">Delete</button>
                                             </form>
                                         </div>
                                     </div>
@@ -87,7 +87,7 @@
                 {% empty %}
                     <tr>
                         <td colspan="10" class="text-center" style="color: #bb2525; font-weight: 600;">
-                            No hay vuelos disponibles.
+                            There are no flights available.
                         </td>
                     </tr>
                 {% endfor %}
@@ -105,7 +105,7 @@
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header" style="background-color: #577399; color: white;">
-                    <h5 class="modal-title" id="createFlightLabel">Agregar nuevo vuelo</h5>
+                    <h5 class="modal-title" id="createFlightLabel">Add new flight</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                 </div>
                 <form method="post">
@@ -114,8 +114,8 @@
                         {{ form.as_p }}
                     </div>
                     <div class="modal-footer">
-                        <button type="submit" name="action" value="create" class="btn btn-primary" style="background-color: #577399; border: none;">Guardar Vuelo</button>
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" name="action" value="create" class="btn btn-primary" style="background-color: #577399; border: none;">Save flight</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                     </div>
                 </form>
             </div>
@@ -132,7 +132,7 @@
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
                     <div class="modal-header" style="background-color: #577399; color: white;">
-                        <h5 class="modal-title" id="updateFlightLabel{{ flight.id }}">Editar vuelo #{{ flight.id }}</h5>
+                        <h5 class="modal-title" id="updateFlightLabel{{ flight.id }}">Edit flight #{{ flight.id }}</h5>
                         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                     </div>
                     <form method="post">
@@ -142,8 +142,8 @@
                             {{ form.as_p }}
                         </div>
                         <div class="modal-footer">
-                            <button type="submit" name="action" value="update" class="btn btn-primary" style="background-color: #577399; border: none;">Guardar</button>
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" name="action" value="update" class="btn btn-primary" style="background-color: #577399; border: none;">Save</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                         </div>
                     </form>
                 </div>

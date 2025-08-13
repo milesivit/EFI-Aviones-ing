@@ -76,3 +76,14 @@ class FlightService:
         if origin:
             return FlightRepository.search_by_origin(origin=origin)
         return ValueError("El Origen No Existe")
+    
+    @staticmethod
+    def get_upcoming_flights() -> list[Flight]:
+        """Devuelve solo los vuelos cuya fecha de salida sea hoy o posterior."""
+        all_flights = FlightRepository.get_all()
+        today = datetime.now().date()  # obtenemos solo la fecha actual, sin hora
+        upcoming_flights = [
+            flight for flight in all_flights
+            if flight.departure_date.date() >= today
+        ]
+        return upcoming_flights

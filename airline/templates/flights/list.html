@@ -1,18 +1,12 @@
 {% extends 'base.html' %} 
 
-{% block title %}Vuelos{% endblock %}
+{% block title %}Flight History{% endblock %}
 
 {% block content %}
 
 <div class="container my-4">
 
-  <h1 class="mb-4" style="color: #577399; font-weight: 700;">List of Planes</h1>
-
-  {% if request.user.is_staff %}
-    <a class="btn btn-primary mb-3" style="background-color: #577399; border: none;" href="{% url 'flight_administration' %}">
-      Plane administration
-    </a>
-  {% endif %}
+  <h1 class="mb-4" style="color: #577399; font-weight: 700;">Flight History</h1>
 
   <div class="table-responsive">
     <table class="table table-striped table-bordered table-hover shadow-sm" style="background: white; border-radius: 8px; overflow: hidden;">
@@ -43,9 +37,10 @@
             <td>{{ flight.status }}</td>
             <td>{{ flight.plane.model }}</td>
             <td>
-              <a href="{% url 'add_passenger' flight.id %}" class="btn btn-success btn-sm">
-                Reserve
-              </a>
+                <!-- El administrador puede ver todas las reservas del vuelo -->
+                <a href="{% url 'reservation_by_flight' flight.id%}" class="btn btn-primary btn-sm">
+                  See reservations <i class="bi bi-info-circle"></i>
+                </a>
             </td>
           </tr>
         {% empty %}

@@ -13,6 +13,7 @@ class ReservationService:
         flight_id: int,
         passenger_id: int,
         seat_id: int,
+        user_id: int
     ) -> Reservation:
         return ReservationRepository.create(
             status=status,
@@ -22,6 +23,7 @@ class ReservationService:
             flight_id=flight_id,
             passenger_id=passenger_id,
             seat_id=seat_id,
+            user_id=user_id
         )
 
     @staticmethod
@@ -41,6 +43,7 @@ class ReservationService:
         flight_id: int,
         passenger_id: int,
         seat_id: int,
+        user_id: int
     ) -> Reservation:
         reservation = ReservationRepository.get_by_id(reservation_id=reservation_id)
         if not reservation:
@@ -54,6 +57,7 @@ class ReservationService:
             flight_id=flight_id,
             passenger_id=passenger_id,
             seat_id=seat_id,
+            user_id=user_id
         )
 
     @staticmethod
@@ -73,3 +77,11 @@ class ReservationService:
         if not reservations:
             raise ValueError("No se encontraron reservas con ese estado")
         return reservations
+
+    @staticmethod
+    def get_by_user(user_id: int) -> list[Reservation]:
+        return ReservationRepository.get_by_user(user_id=user_id)   
+    
+    @staticmethod
+    def get_by_flight(flight_id: int) -> list[Reservation]:
+        return ReservationRepository.get_by_flight(flight_id=flight_id)

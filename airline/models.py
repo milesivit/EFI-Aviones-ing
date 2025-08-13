@@ -108,6 +108,7 @@ class Reservation(models.Model):
     flight = models.ForeignKey(Flight, on_delete=models.CASCADE) #vuelo id
     passenger = models.ForeignKey(Passenger, on_delete=models.CASCADE) #pasajero id
     seat = models.OneToOneField(Seat, on_delete=models.CASCADE) #asiento id
+    user = models.ForeignKey(User, on_delete=models.CASCADE) #usuario id
     
     def __str__(self):
         return f"Reservation {self.reservation_code} for {self.passenger.name}"
