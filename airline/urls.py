@@ -14,9 +14,26 @@ from airline.views import (
     add_passenger,
     select_seat,
     confirm_reservation,
+    reservation_by_user,
+    download_ticket,
+    reservation_by_flight,
+    upcoming_flight_list
 )
 
 urlpatterns = [
+    path('reservation-administrator/<int:flight_id>/', 
+         view=reservation_by_flight, 
+         name='reservation_by_flight'
+    ),
+    path('reservation/<int:reservation_id>/download/', 
+         view=download_ticket, 
+         name='download_ticket'
+    ),
+    path(
+        'my-reservations/',
+        reservation_by_user,
+        name='reservation_by_user'
+    ),
     path(
         route='flights/<int:flight_id>/passenger/<int:passenger_id>/seat/<int:seat_id>/confirm/',
         view=confirm_reservation,
@@ -64,6 +81,11 @@ urlpatterns = [
         route='planes/details/<int:plane_id>',
         view=plane_detail,
         name='plane_detail'
+    ),
+    path(
+        route='flights-availables/',
+        view=upcoming_flight_list,
+        name='upcoming_flight_list',
     ),
     path(
         route='flights/',

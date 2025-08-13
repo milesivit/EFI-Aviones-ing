@@ -35,9 +35,9 @@ class SeatAdmin(admin.ModelAdmin):
 
 @admin.register(Reservation)
 class ReservationAdmin(admin.ModelAdmin):
-    list_display = ('id', 'reservation_code', 'flight', 'passenger', 'seat', 'status', 'reservation_date', 'price')
-    list_filter = ('status', 'reservation_date')
-    search_fields = ('reservation_code', 'passenger__name', 'flight__origin', 'flight__destination')
+    list_display = ('id', 'reservation_code', 'flight', 'passenger', 'seat', 'status', 'reservation_date', 'price', 'user')
+    list_filter = ('status', 'reservation_date', 'user')
+    search_fields = ('reservation_code', 'passenger__name', 'flight__origin', 'flight__destination', 'user__username')
 
 @admin.register(Ticket)
 class TicketAdmin(admin.ModelAdmin):

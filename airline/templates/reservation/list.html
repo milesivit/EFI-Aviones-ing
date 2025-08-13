@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">My Reservations</h2>
+
+    {% if reservations %}
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Code</th>
+                        <th>Flight</th>
+                        <th>Passenger</th>
+                        <th>Seat</th>
+                        <th>Status</th>
+                        <th>Date</th>
+                        <th>Price</th>
+                        <th>Ticket PDF</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for r in reservations %}
+                        <tr>
+                            <td>{{ r.reservation_code }}</td>
+                            <td>{{ r.flight.origin }} → {{ r.flight.destination }}</td>
+                            <td>{{ r.passenger.name }}</td>
+                            <td>{{ r.seat.row }}{{ r.seat.column }} ({{ r.seat.seat_type }})</td>
+                            <td>{{ r.status }}</td>
+                            <td>{{ r.reservation_date|date:"d/m/Y H:i" }}</td>
+                            <td>${{ r.price }}</td>
+                            <td>
+                                <a href="{% url 'download_ticket' r.id %}" class="btn btn-sm btn-primary">
+                                    Download
+                                </a>
+                            </td>
+                            
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="alert alert-info">
+            You have no registered reservations.
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

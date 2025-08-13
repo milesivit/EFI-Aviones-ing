@@ -23,9 +23,10 @@ from django.shortcuts import get_object_or_404
 import random
 import string
 from datetime import datetime
-
+from django.http import HttpResponse
+from airline.utils.ticket_pdf import generate_ticket_pdf
 #------------------------------------------------------------------------
-
+#reservas
 from django.shortcuts import redirect
 
 def confirm_reservation(request, flight_id, passenger_id, seat_id):
@@ -48,6 +49,7 @@ def confirm_reservation(request, flight_id, passenger_id, seat_id):
             flight_id=flight.id,
             passenger_id=passenger.id,
             seat_id=seat.id,
+            user_id=request.user.id,
         )
 
         barcode = ''.join(random.choices(string.ascii_uppercase + string.digits, k=12))
@@ -71,6 +73,30 @@ def confirm_reservation(request, flight_id, passenger_id, seat_id):
         'passenger': passenger,
         'seat': seat,
     })
+
+def reservation_by_user(request):
+    # Obtener las reservas del usuario actual
+    reservations = ReservationService.get_by_user(user_id=request.user.id)
+    
+    return render(
+        request,
+        'reservation/list.html',
+        {'reservations': reservations}
+    )
+
+def reservation_by_flight(request, flight_id):
+    reservations = ReservationService.get_by_flight(flight_id=flight_id)
+    return render(request, 'reservation/administrator.html', {'reservations': reservations})
+#----------------------------------------------------------------------------------
+#ticket
+def download_ticket(request, reservation_id):
+    try:
+        reservation = ReservationService.get_by_id(reservation_id)
+        ticket = reservation.ticket
+        return generate_ticket_pdf(reservation, ticket)
+    except Exception as e:
+        return HttpResponse(f"Error: {str(e)}")
+
 #-----------------------------------------------------------------------------------
 #flight status
 
@@ -402,14 +428,17 @@ def user_login(request):
 
 
 # --------------------------------------------------------------------
-# Función para listar vuelos (sin cambios)
+# vuelos
 def flight_list(request):
     flights = FlightService.get_all()
     return render(request, 'flights/list.html', {'flights': flights})
 
+# Función para listar solo vuelos futuros
+def upcoming_flight_list(request):
+    flights = FlightService.get_upcoming_flights() 
+    return render(request, 'flights/flight_available.html', {'flights': flights})
 
-# --------------------------------------------------------------------
-# Función para administrar vuelos (sin cambios)
+# Función para administrar vuelos 
 def flight_administration(request):
     flights = FlightService.get_all()
     form = CreateFlightForm()
