@@ -3,22 +3,20 @@
 {% block title %}Registro{% endblock %}
 
 {% block content %}
-<div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-6">
-            <h2 class="mb-4">Register</h2>
+<div class="d-flex justify-content-center align-items-center" style="min-height: 100%;">
+    <!-- Card -->
+    <div class="card shadow" style="max-width: 600px; width: 70%; border-radius: 15px; overflow: hidden; margin-bottom: 50px;">
+        <!-- Encabezado -->
+        <div class="card-header text-white" style="background-color: #577399; padding: 1rem 2rem;">
+            <h4 class="mb-0">Register your account</h4>
+        </div>
 
+        <!-- Cuerpo de la card -->
+        <div class="card-body" style="background-color: white; padding: 2rem;">
             <form method="post">
                 {% csrf_token %}
 
-                {# Mostrar errores generales del formulario #}
-                {% if form.non_field_errors %}
-                    <div class="alert alert-danger">
-                        {{ form.non_field_errors }}
-                    </div>
-                {% endif %}
-
-                <div class="form-group mb-3">
+                <div class="mb-3">
                     <label for="{{ form.username.id_for_label }}">{{ form.username.label }}</label>
                     {{ form.username }}
                     {% if form.username.errors %}
@@ -26,23 +24,7 @@
                     {% endif %}
                 </div>
 
-                <div class="form-group mb-3">
-                    <label for="{{ form.password1.id_for_label }}">{{ form.password1.label }}</label>
-                    {{ form.password1 }}
-                    {% if form.password1.errors %}
-                        <div class="text-danger">{{ form.password1.errors }}</div>
-                    {% endif %}
-                </div>
-
-                <div class="form-group mb-3">
-                    <label for="{{ form.password2.id_for_label }}">{{ form.password2.label }}</label>
-                    {{ form.password2 }}
-                    {% if form.password2.errors %}
-                        <div class="text-danger">{{ form.password2.errors }}</div>
-                    {% endif %}
-                </div>
-
-                <div class="form-group mb-3">
+                <div class="mb-3">
                     <label for="{{ form.email.id_for_label }}">{{ form.email.label }}</label>
                     {{ form.email }}
                     {% if form.email.errors %}
@@ -50,7 +32,23 @@
                     {% endif %}
                 </div>
 
-                <div class="form-group form-check mb-3">
+                <div class="mb-3">
+                    <label for="{{ form.password1.id_for_label }}">{{ form.password1.label }}</label>
+                    {{ form.password1 }}
+                    {% if form.password1.errors %}
+                        <div class="text-danger">{{ form.password1.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="mb-3">
+                    <label for="{{ form.password2.id_for_label }}">{{ form.password2.label }}</label>
+                    {{ form.password2 }}
+                    {% if form.password2.errors %}
+                        <div class="text-danger">{{ form.password2.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="form-check mb-3">
                     {{ form.is_admin }}
                     <label class="form-check-label" for="{{ form.is_admin.id_for_label }}">{{ form.is_admin.label }}</label>
                     {% if form.is_admin.errors %}
@@ -58,8 +56,18 @@
                     {% endif %}
                 </div>
 
-                <button type="submit" class="btn btn-success mt-3">Registrarme</button>
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-lg" style="background-color: #41c230; color: white; font-size: 1.1rem;">
+                        Register
+                    </button>
+                </div>
             </form>
+
+            <div class="text-center mt-4">
+                <small>Already have an account? 
+                    <a href="{% url 'user_login' %}" style="color: red; font-weight: bold;">Login here</a>
+                </small>
+            </div>
         </div>
     </div>
 </div>

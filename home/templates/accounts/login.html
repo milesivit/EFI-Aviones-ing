@@ -1,22 +1,39 @@
 {% extends 'base.html' %}
 
-{% block title %} Login {% endblock %}
+{% block title %}Login{% endblock %}
 
-{% block content %} 
-    <div class="row">
-        <div class="col-4"></div>
-        <div class="col-4">
-            <h2> Login </h2>
+{% block content %}
+<div class="d-flex justify-content-center align-items-center" style="min-height: calc(100vh - 70px);">
+    <!-- Card -->
+    <div class="card shadow" style="max-width: 600px; width: 100%; border-radius: 15px; overflow: hidden; margin-bottom: 50px;">
+        
+        <!-- Encabezado de la card -->
+        <div class="card-header text-white" style="background-color: #577399; padding: 1rem 2rem;">
+            <h4 class="mb-0">Access your account</h4>
+        </div>
 
-        <form method="post" >
-            {% csrf_token %}
-            {{ form }}
-            <br>
-            <button class="btn btn-success mt-4" type="submit"> Access </button>
-        </form>
-        <p> Don't you have an account? <a href="{% url 'user_register' %}"> Register here </a> </p>
-     </div>
-        <div class="col-4"></div>
+        <!-- Cuerpo de la card -->
+        <div class="card-body" style="background-color: white; padding: 2rem;">
+            <form method="post">
+                {% csrf_token %}
+                
+                <div class="mb-4">
+                    {{ form.as_p }}
+                </div>
+                
+                <div class="d-grid gap-2">
+                    <button class="btn btn-lg" type="submit" style="background-color: #41c230; color: white; font-size: 1.1rem;">
+                        Access
+                    </button>
+                </div>
+            </form>
+
+            <div class="text-center mt-4">
+                <small>Don't have an account? 
+                    <a href="{% url 'user_register' %}" style="color: red; font-weight: bold;">Register here</a>
+                </small>
+            </div>
+        </div>
     </div>
-    
+</div>
 {% endblock %}
