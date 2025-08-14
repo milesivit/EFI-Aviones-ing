@@ -46,7 +46,7 @@ class SeatRepository:
         column: str,
         seat_type: str,
         status: str,
-        plane_id: int
+        plane_id: int,
     ) -> Seat:
         try:
             plane = Plane.objects.get(id=plane_id)

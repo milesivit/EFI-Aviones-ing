@@ -26,7 +26,7 @@ class TicketService:
             barcode=barcode,
             issue_date=issue_date,
             status=status,
-            reservation_id=reservation.id,  
+            reservation_id=reservation.id,
         )
 
     @staticmethod

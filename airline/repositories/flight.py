@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from airline.models import Flight, FlightStatus ,Plane, User 
+from airline.models import Flight, FlightStatus, Plane, User
 
 
 class FlightRepository:

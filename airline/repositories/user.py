@@ -54,13 +54,7 @@ class UserRepository:
             raise ValueError("El usuario no existe")
 
     @staticmethod
-    def update(
-        user: User,
-        username: str,
-        password: str,
-        email: str,
-        role: str
-    ) -> User:
+    def update(user: User, username: str, password: str, email: str, role: str) -> User:
         user.username = username
         if password:  # <-- solo actualizo si password tiene contenido
             user.set_password(password)
@@ -69,7 +63,6 @@ class UserRepository:
         user.save()
 
         return user
-
 
     @staticmethod
     def get_all() -> list[User]:

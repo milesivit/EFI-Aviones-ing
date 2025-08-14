@@ -2,6 +2,7 @@ from datetime import datetime
 from airline.models import Reservation
 from airline.repositories.reservation import ReservationRepository
 
+
 class ReservationService:
 
     @staticmethod
@@ -13,7 +14,7 @@ class ReservationService:
         flight_id: int,
         passenger_id: int,
         seat_id: int,
-        user_id: int
+        user_id: int,
     ) -> Reservation:
         return ReservationRepository.create(
             status=status,
@@ -23,7 +24,7 @@ class ReservationService:
             flight_id=flight_id,
             passenger_id=passenger_id,
             seat_id=seat_id,
-            user_id=user_id
+            user_id=user_id,
         )
 
     @staticmethod
@@ -32,7 +33,7 @@ class ReservationService:
         if not reservation:
             raise ValueError("La reserva no existe")
         return ReservationRepository.delete(reservation=reservation)
-    
+
     @staticmethod
     def update(
         reservation_id: int,
@@ -43,7 +44,7 @@ class ReservationService:
         flight_id: int,
         passenger_id: int,
         seat_id: int,
-        user_id: int
+        user_id: int,
     ) -> Reservation:
         reservation = ReservationRepository.get_by_id(reservation_id=reservation_id)
         if not reservation:
@@ -57,20 +58,20 @@ class ReservationService:
             flight_id=flight_id,
             passenger_id=passenger_id,
             seat_id=seat_id,
-            user_id=user_id
+            user_id=user_id,
         )
 
     @staticmethod
     def get_all() -> list[Reservation]:
-        return ReservationRepository.get_all() 
-    
+        return ReservationRepository.get_all()
+
     @staticmethod
     def get_by_id(reservation_id: int) -> Reservation:
         reservation = ReservationRepository.get_by_id(reservation_id=reservation_id)
         if not reservation:
             raise ValueError("La reserva no existe")
         return reservation
-    
+
     @staticmethod
     def search_by_status(status: str) -> list[Reservation]:
         reservations = ReservationRepository.search_by_status(status=status)
@@ -80,8 +81,8 @@ class ReservationService:
 
     @staticmethod
     def get_by_user(user_id: int) -> list[Reservation]:
-        return ReservationRepository.get_by_user(user_id=user_id)   
-    
+        return ReservationRepository.get_by_user(user_id=user_id)
+
     @staticmethod
     def get_by_flight(flight_id: int) -> list[Reservation]:
         return ReservationRepository.get_by_flight(flight_id=flight_id)

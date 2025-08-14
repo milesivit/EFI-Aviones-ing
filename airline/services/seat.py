@@ -1,6 +1,7 @@
 from airline.models import Seat
 from airline.repositories.seat import SeatRepository
 
+
 class SeatService:
 
     @staticmethod
@@ -27,7 +28,7 @@ class SeatService:
         if seat:
             return SeatRepository.delete(seat=seat)
         return False
-    
+
     @staticmethod
     def update(
         seat_id: int,
@@ -52,14 +53,14 @@ class SeatService:
 
     @staticmethod
     def get_all() -> list[Seat]:
-        return SeatRepository.get_all() 
-    
+        return SeatRepository.get_all()
+
     @staticmethod
     def get_by_id(seat_id: int) -> list[Seat]:
         if seat_id:
             return SeatRepository.get_by_id(seat_id=seat_id)
         return ValueError("El Asiento No Existe")
-    
+
     @staticmethod
     def search_by_number(number: str) -> list[Seat]:
         if number:

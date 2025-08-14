@@ -1,6 +1,7 @@
 from airline.models import Plane
 from airline.repositories.plane import PlaneRepository
 
+
 class PlaneService:
 
     @staticmethod
@@ -23,7 +24,7 @@ class PlaneService:
         if plane:
             return PlaneRepository.delete(plane=plane)
         return False
-    
+
     @staticmethod
     def update(
         plane_id: int,
@@ -44,14 +45,14 @@ class PlaneService:
 
     @staticmethod
     def get_all() -> list[Plane]:
-        return PlaneRepository.get_all() 
-    
+        return PlaneRepository.get_all()
+
     @staticmethod
     def get_by_id(plane_id: int) -> list[Plane]:
         if plane_id:
             return PlaneRepository.get_by_id(plane_id=plane_id)
         return ValueError("El Avion No Existe")
-    
+
     @staticmethod
     def search_by_model(model: str) -> list[Plane]:
         if model:

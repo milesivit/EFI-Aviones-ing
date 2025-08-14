@@ -10,106 +10,240 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('auth', '0012_alter_user_first_name_max_length'),
+        ("auth", "0012_alter_user_first_name_max_length"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='FlightStatus',
+            name="FlightStatus",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('status', models.CharField(max_length=100)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("status", models.CharField(max_length=100)),
             ],
         ),
         migrations.CreateModel(
-            name='Passenger',
+            name="Passenger",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=255)),
-                ('document', models.CharField(max_length=50)),
-                ('document_type', models.CharField(max_length=50)),
-                ('email', models.EmailField(max_length=254)),
-                ('phone', models.CharField(max_length=20)),
-                ('birth_date', models.DateField()),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=255)),
+                ("document", models.CharField(max_length=50)),
+                ("document_type", models.CharField(max_length=50)),
+                ("email", models.EmailField(max_length=254)),
+                ("phone", models.CharField(max_length=20)),
+                ("birth_date", models.DateField()),
             ],
         ),
         migrations.CreateModel(
-            name='Plane',
+            name="Plane",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('model', models.CharField(max_length=100)),
-                ('capacity', models.PositiveIntegerField()),
-                ('rows', models.PositiveIntegerField()),
-                ('columns', models.PositiveIntegerField()),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("model", models.CharField(max_length=100)),
+                ("capacity", models.PositiveIntegerField()),
+                ("rows", models.PositiveIntegerField()),
+                ("columns", models.PositiveIntegerField()),
             ],
         ),
         migrations.CreateModel(
-            name='User',
+            name="User",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('password', models.CharField(max_length=128, verbose_name='password')),
-                ('last_login', models.DateTimeField(blank=True, null=True, verbose_name='last login')),
-                ('is_superuser', models.BooleanField(default=False, help_text='Designates that this user has all permissions without explicitly assigning them.', verbose_name='superuser status')),
-                ('username', models.CharField(max_length=150, unique=True)),
-                ('email', models.EmailField(max_length=254, unique=True)),
-                ('role', models.CharField(max_length=50)),
-                ('is_active', models.BooleanField(default=True)),
-                ('is_staff', models.BooleanField(default=False)),
-                ('groups', models.ManyToManyField(blank=True, help_text='The groups this user belongs to. A user will get all permissions granted to each of their groups.', related_name='user_set', related_query_name='user', to='auth.group', verbose_name='groups')),
-                ('user_permissions', models.ManyToManyField(blank=True, help_text='Specific permissions for this user.', related_name='user_set', related_query_name='user', to='auth.permission', verbose_name='user permissions')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("password", models.CharField(max_length=128, verbose_name="password")),
+                (
+                    "last_login",
+                    models.DateTimeField(
+                        blank=True, null=True, verbose_name="last login"
+                    ),
+                ),
+                (
+                    "is_superuser",
+                    models.BooleanField(
+                        default=False,
+                        help_text="Designates that this user has all permissions without explicitly assigning them.",
+                        verbose_name="superuser status",
+                    ),
+                ),
+                ("username", models.CharField(max_length=150, unique=True)),
+                ("email", models.EmailField(max_length=254, unique=True)),
+                ("role", models.CharField(max_length=50)),
+                ("is_active", models.BooleanField(default=True)),
+                ("is_staff", models.BooleanField(default=False)),
+                (
+                    "groups",
+                    models.ManyToManyField(
+                        blank=True,
+                        help_text="The groups this user belongs to. A user will get all permissions granted to each of their groups.",
+                        related_name="user_set",
+                        related_query_name="user",
+                        to="auth.group",
+                        verbose_name="groups",
+                    ),
+                ),
+                (
+                    "user_permissions",
+                    models.ManyToManyField(
+                        blank=True,
+                        help_text="Specific permissions for this user.",
+                        related_name="user_set",
+                        related_query_name="user",
+                        to="auth.permission",
+                        verbose_name="user permissions",
+                    ),
+                ),
             ],
             options={
-                'abstract': False,
+                "abstract": False,
             },
         ),
         migrations.CreateModel(
-            name='Flight',
+            name="Flight",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('origin', models.CharField(max_length=100)),
-                ('destination', models.CharField(max_length=100)),
-                ('departure_date', models.DateTimeField()),
-                ('arrival_date', models.DateTimeField()),
-                ('duration', models.DurationField()),
-                ('base_price', models.DecimalField(decimal_places=2, max_digits=10)),
-                ('user', models.ManyToManyField(to=settings.AUTH_USER_MODEL)),
-                ('status', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='airline.flightstatus')),
-                ('plane', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='airline.plane')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("origin", models.CharField(max_length=100)),
+                ("destination", models.CharField(max_length=100)),
+                ("departure_date", models.DateTimeField()),
+                ("arrival_date", models.DateTimeField()),
+                ("duration", models.DurationField()),
+                ("base_price", models.DecimalField(decimal_places=2, max_digits=10)),
+                ("user", models.ManyToManyField(to=settings.AUTH_USER_MODEL)),
+                (
+                    "status",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="airline.flightstatus",
+                    ),
+                ),
+                (
+                    "plane",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="airline.plane"
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='Seat',
+            name="Seat",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('number', models.CharField(max_length=10)),
-                ('row', models.PositiveIntegerField()),
-                ('column', models.CharField(max_length=1)),
-                ('seat_type', models.CharField(max_length=50)),
-                ('status', models.CharField(max_length=50)),
-                ('plane', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='airline.plane')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("number", models.CharField(max_length=10)),
+                ("row", models.PositiveIntegerField()),
+                ("column", models.CharField(max_length=1)),
+                ("seat_type", models.CharField(max_length=50)),
+                ("status", models.CharField(max_length=50)),
+                (
+                    "plane",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="airline.plane"
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='Reservation',
+            name="Reservation",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('status', models.CharField(max_length=50)),
-                ('reservation_date', models.DateTimeField()),
-                ('price', models.DecimalField(decimal_places=2, max_digits=10)),
-                ('reservation_code', models.CharField(max_length=20, unique=True)),
-                ('flight', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='airline.flight')),
-                ('passenger', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='airline.passenger')),
-                ('seat', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to='airline.seat')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("status", models.CharField(max_length=50)),
+                ("reservation_date", models.DateTimeField()),
+                ("price", models.DecimalField(decimal_places=2, max_digits=10)),
+                ("reservation_code", models.CharField(max_length=20, unique=True)),
+                (
+                    "flight",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="airline.flight"
+                    ),
+                ),
+                (
+                    "passenger",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="airline.passenger",
+                    ),
+                ),
+                (
+                    "seat",
+                    models.OneToOneField(
+                        on_delete=django.db.models.deletion.CASCADE, to="airline.seat"
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='Ticket',
+            name="Ticket",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('barcode', models.CharField(max_length=100, unique=True)),
-                ('issue_date', models.DateTimeField(auto_now_add=True)),
-                ('status', models.CharField(max_length=50)),
-                ('reservation', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to='airline.reservation')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("barcode", models.CharField(max_length=100, unique=True)),
+                ("issue_date", models.DateTimeField(auto_now_add=True)),
+                ("status", models.CharField(max_length=50)),
+                (
+                    "reservation",
+                    models.OneToOneField(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="airline.reservation",
+                    ),
+                ),
             ],
         ),
     ]

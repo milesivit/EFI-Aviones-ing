@@ -1,6 +1,7 @@
 from airline.models import FlightStatus
 
-class FlightStatusRepository: 
+
+class FlightStatusRepository:
     """
     Repositorio para manipular objetos FlightStatus (Estados de Vuelo) en la base de datos.
     Contiene métodos estáticos para realizar operaciones CRUD (crear, leer, actualizar, eliminar).
@@ -19,7 +20,7 @@ class FlightStatusRepository:
         """
         flight_status = FlightStatus.objects.create(status=status)
         return flight_status
-    
+
     @staticmethod
     def delete(flght_status: FlightStatus) -> bool:
         """
@@ -33,7 +34,7 @@ class FlightStatusRepository:
 
         Raises:
             ValueError: Si la instancia no existe.
-        
+
         Observación:
             - `True()` está mal, debería ser simplemente `True` (sin paréntesis).
             - El error que captura es innecesario porque `.delete()` sobre una instancia no lanza `DoesNotExist`.
@@ -43,7 +44,7 @@ class FlightStatusRepository:
             return True  # Corregido: era `True()`
         except FlightStatus.DoesNotExist:
             raise ValueError("El estado de vuelo no existe")
-        
+
     @staticmethod
     def update(flight_status: FlightStatus, stauts: str) -> FlightStatus:
         """
@@ -62,7 +63,7 @@ class FlightStatusRepository:
         flight_status.status = stauts  # Debería ser `status`
         flight_status.save()
         return flight_status
-    
+
     @staticmethod
     def get_all() -> list[FlightStatus]:
         """
@@ -72,7 +73,7 @@ class FlightStatusRepository:
             list[FlightStatus]: Lista de todas las instancias.
         """
         return FlightStatus.objects.all()
-    
+
     @staticmethod
     def get_by_id(flight_status_id: int) -> FlightStatus:
         """
