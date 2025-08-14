@@ -59,17 +59,6 @@ class PassengerForm(forms.Form):
         super().__init__(*args, **kwargs)
         self.flight_id = flight_id  # guardo el vuelo para validar
 
-    def clean_document(self):
-        document = self.cleaned_data.get('document')
-        if document and Passenger.objects.filter(document=document).exists():
-            raise ValidationError("Ya existe un pasajero registrado con este documento.")
-        return document
-
-    def clean_email(self):
-        email = self.cleaned_data.get('email')
-        if email and Passenger.objects.filter(email=email).exists():
-            raise ValidationError("Ya existe un pasajero registrado con este email.")
-        return email
     
 class CreateFlightForm(forms.Form):
     origin = forms.CharField(

@@ -16,7 +16,7 @@
                         <th>Estado</th>
                         <th>Fecha</th>
                         <th>Precio</th>
-                        <th>Ticket</th>
+                        <th>Ticket PDF</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -31,7 +31,7 @@
                             <td>${{ r.price }}</td>
                             <td>
                                 <a href="{% url 'download_ticket' r.id %}" class="btn btn-sm btn-primary">
-                                    Descargar PDF
+                                    Download
                                 </a>
                             </td>
                         </tr>
