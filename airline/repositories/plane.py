@@ -54,11 +54,7 @@ class PlaneRepository:
 
     @staticmethod
     def update(
-        plane: Plane,
-        model: str,
-        capacity: int,
-        rows: int,
-        columns: int
+        plane: Plane, model: str, capacity: int, rows: int, columns: int
     ) -> Plane:
         """
         Actualiza los datos de un avión.

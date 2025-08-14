@@ -42,7 +42,7 @@ class ReservationRepository:
             flight_id=flight_id,
             passenger_id=passenger_id,
             seat_id=seat_id,
-            user_id=user_id
+            user_id=user_id,
         )
 
     @staticmethod
@@ -126,16 +126,14 @@ class ReservationRepository:
             Lista de reservas coincidentes.
         """
         return Reservation.objects.filter(reservation_code__icontains=reservation_code)
-    
+
     @staticmethod
     def get_by_user(user_id: int) -> list[Reservation]:
         """
         Obtiene todas las reservas de un usuario específico.
         """
         return Reservation.objects.filter(user_id=user_id)
-    
+
     @staticmethod
     def get_by_flight(flight_id: int) -> list[Reservation]:
         return Reservation.objects.filter(flight_id=flight_id)
-
-    

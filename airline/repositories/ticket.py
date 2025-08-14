@@ -37,7 +37,7 @@ class TicketRepository:
         barcode: str,
         issue_date: datetime,
         status: str,
-        reservation_id: int
+        reservation_id: int,
     ) -> Ticket:
         reservation = Reservation.objects.get(id=reservation_id)
         ticket.barcode = barcode

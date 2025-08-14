@@ -3,6 +3,7 @@ from airline.repositories.flight import FlightRepository
 
 from datetime import datetime, timedelta
 
+
 class FlightService:
     @staticmethod
     def create(
@@ -34,7 +35,7 @@ class FlightService:
         if flight:
             return FlightRepository.delete(flight=flight)
         return False
-    
+
     @staticmethod
     def update(
         flight: Flight,
@@ -56,34 +57,32 @@ class FlightService:
         flight.status = status
         flight.base_price = base_price
         flight.plane_id = plane_id
-        flight.user_id.set(user_ids) 
+        flight.user_id.set(user_ids)
         flight.save()
         return flight
 
-
     @staticmethod
     def get_all() -> list[Flight]:
-        return FlightRepository.get_all() 
-    
+        return FlightRepository.get_all()
+
     @staticmethod
     def get_by_id(flight_id: int) -> list[Flight]:
         if flight_id:
             return FlightRepository.get_by_id(flight_id=flight_id)
         return ValueError("El Vuelo No Existe")
-    
+
     @staticmethod
     def search_by_origin(origin: str) -> list[Flight]:
         if origin:
             return FlightRepository.search_by_origin(origin=origin)
         return ValueError("El Origen No Existe")
-    
+
     @staticmethod
     def get_upcoming_flights() -> list[Flight]:
         """Devuelve solo los vuelos cuya fecha de salida sea hoy o posterior."""
         all_flights = FlightRepository.get_all()
         today = datetime.now().date()  # obtenemos solo la fecha actual, sin hora
         upcoming_flights = [
-            flight for flight in all_flights
-            if flight.departure_date.date() >= today
+            flight for flight in all_flights if flight.departure_date.date() >= today
         ]
         return upcoming_flights
