@@ -66,7 +66,7 @@ def confirm_reservation(request, flight_id, passenger_id, seat_id):
         request.session['ticket_id'] = ticket.id
 
         # Redirigir a la lista de vuelos
-        return redirect('flight_list')  
+        return redirect('upcoming_flight_list')  
 
     return render(request, 'reservation/confirm_reservation.html', {
         'flight': flight,
@@ -120,7 +120,6 @@ def add_status_flight(request):
 
 # --------------------------------------------------------------------
 #passengers 
-
 def add_passenger(request, flight_id):
     flight = get_object_or_404(Flight, id=flight_id)
 
@@ -128,22 +127,32 @@ def add_passenger(request, flight_id):
         form = PassengerForm(request.POST)
         if form.is_valid():
             cd = form.cleaned_data
+            name_clean = cd['name'].strip().lower()
+            document_clean = cd['document'].strip()
 
-            # Crear pasajero usando el servicio
-            passenger = PassengerService.create(
-                name=cd['name'],
-                document=cd['document'],
-                document_type=cd['document_type'],
-                email=cd['email'],
-                phone=cd['phone'],
-                birth_date=cd['birth_date'],
-            )
+            # Buscar si ya hay un pasajero con ese documento en este vuelo
+            existing = Reservation.objects.filter(
+                flight_id=flight,
+                passenger__document=document_clean
+            ).first()
 
-            return redirect('select_seat', flight_id=flight.id, passenger_id=passenger.id)
+            if existing:
+                form.add_error('name', 'Este pasajero ya está registrado en este vuelo.')
+            else:
+                # Crear el pasajero
+                passenger = PassengerService.create(
+                    name=cd['name'],
+                    document=cd['document'],
+                    document_type=cd['document_type'],
+                    email=cd['email'],
+                    phone=cd['phone'],
+                    birth_date=cd['birth_date'],
+                )
 
+                return redirect('select_seat', flight_id=flight.id, passenger_id=passenger.id)
     else:
         form = PassengerForm()
-    
+
     return render(request, 'passenger/add_passenger.html', {'form': form, 'flight': flight})
 
 #---------------------------------------------------------------

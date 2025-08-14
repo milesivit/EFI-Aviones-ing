@@ -65,7 +65,7 @@
     <!-- Botón buscar -->
     <div class="form-group mb-2 ml-auto">
       {% if user.is_authenticated %}
-        <a href="{% url 'flight_list' %}" class="btn btn-danger px-4" style="font-weight: 600;">
+        <a href="{% url 'upcoming_flight_list' %}" class="btn btn-danger px-4" style="font-weight: 600;">
           Search
         </a>
       {% else %}
@@ -137,35 +137,52 @@
   }
 </style>
 
-<div class="row mt-4">
+<div class="row mt-4 d-flex align-items-stretch">
   <!-- Modal 1 -->
-  <div class="col-md-4 mb-3">
-    <div class="p-4 rounded" style="background-color: #af4c0f; color: white; text-align: center;">
-      <img src="{% static 'img/pr.jpg' %}" alt="Puerto Rico" class="img-fluid mb-3" style="max-height:150px; object-fit: cover; width: 100%; border-radius: 8px;">
+  <div class="col-md-4 mb-3 d-flex">
+    <div class="p-4 rounded h-100 w-100 d-flex flex-column" 
+         style="background-color: #af4c0f; color: white; text-align: center;">
+      <img src="{% static 'img/pr.jpg' %}" 
+           alt="Puerto Rico" 
+           class="img-fluid mb-3" 
+           style="max-height:150px; object-fit: cover; width: 100%; border-radius: 8px;">
       <h5>Flight to Puerto Rico</h5>
       <p>Enjoy the beaches and Caribbean sunshine.</p>
-      <button class="btn btn-light btn-sm">Reserve</button>
+      <div class="mt-auto">
+        <button class="btn btn-light btn-sm">Reserve</button>
+      </div>
     </div>
   </div>
 
-
   <!-- Modal 2 -->
-  <div class="col-md-4 mb-3">
-    <div class="p-4 rounded" style="background-color: #af4c0f; color: white; text-align: center;">
-       <img src="{% static 'img/arg.jpg' %}" alt="Puerto Rico" class="img-fluid mb-3" style="max-height:150px; object-fit: cover; width: 100%; border-radius: 8px;">
+  <div class="col-md-4 mb-3 d-flex">
+    <div class="p-4 rounded h-100 w-100 d-flex flex-column" 
+         style="background-color: #af4c0f; color: white; text-align: center;">
+      <img src="{% static 'img/arg.jpg' %}" 
+           alt="Argentina" 
+           class="img-fluid mb-3" 
+           style="max-height:150px; object-fit: cover; width: 100%; border-radius: 8px;">
       <h5>Flight to Argentina</h5>
       <p>Explore the unique culture and landscapes.</p>
-      <button class="btn btn-light btn-sm">Reserve</button>
+      <div class="mt-auto">
+        <button class="btn btn-light btn-sm">Reserve</button>
+      </div>
     </div>
   </div>
 
   <!-- Modal 3 -->
-  <div class="col-md-4 mb-3">
-    <div class="p-4 rounded" style="background-color: #af4c0f; color: white; text-align: center;">
-       <img src="{% static 'img/disney.jpg' %}" alt="Puerto Rico" class="img-fluid mb-3" style="max-height:150px; object-fit: cover; width: 100%; border-radius: 8px;">
+  <div class="col-md-4 mb-3 d-flex">
+    <div class="p-4 rounded h-100 w-100 d-flex flex-column" 
+         style="background-color: #af4c0f; color: white; text-align: center;">
+      <img src="{% static 'img/disney.jpg' %}" 
+           alt="Disney" 
+           class="img-fluid mb-3" 
+           style="max-height:150px; object-fit: cover; width: 100%; border-radius: 8px;">
       <h5>Flight to Disney</h5>
       <p>Experience the magic at the theme parks, like Magic Kingdom or Universal.</p>
-      <button class="btn btn-light btn-sm">Reserve</button>
+      <div class="mt-auto">
+        <button class="btn btn-light btn-sm">Reserve</button>
+      </div>
     </div>
   </div>
 </div>

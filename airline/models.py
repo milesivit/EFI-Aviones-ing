@@ -101,7 +101,7 @@ class Seat(models.Model):
 
 class Reservation(models.Model):
     status = models.CharField(max_length=50) #estado
-    reservation_date = models.DateTimeField() #fecha de reserva 
+    reservation_date = models.DateTimeField(auto_now_add=True)#fecha de reserva 
     price = models.DecimalField(max_digits=10, decimal_places=2) #precio
     reservation_code = models.CharField(max_length=20, unique=True) #codigo de reserva, unique=True permite que no haya otro codigo igual
 

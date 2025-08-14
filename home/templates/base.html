@@ -116,10 +116,51 @@
       </nav>
 
 
-    <main class="container mt-4">
-      {% block content %}
-      {% endblock %}
-    </main>
+ <body class="d-flex flex-column min-vh-100">
+  <nav class="navbar navbar-expand-lg navbar-dark bg-blue">
+    <!-- tu navbar aquí -->
+  </nav>
+
+  <main class="container mt-4 flex-grow-1">
+    {% block content %}
+    {% endblock %}
+  </main>
+
+  <footer class="bg-blue text-white mt-auto">
+    <div class="container py-4">
+      <div class="row">
+        <!-- Información de la empresa -->
+        <div class="col-md-4 mb-3">
+          <h5>Airline System</h5>
+          <p>Providing you the best flight experience with comfort and safety. ✈️</p>
+        </div>
+
+        <!-- Enlaces rápidos solo para usuarios logueados -->
+        {% if user.is_authenticated %}
+        <div class="col-md-4 mb-3">
+          <h5>Quick Links</h5>
+          <ul class="list-unstyled">
+            <li><a href="{% url 'help_view' %}" class="text-white">Help</a></li>
+          </ul>
+        </div>
+        {% endif %}
+
+        <!-- Contacto -->
+        <div class="col-md-4 mb-3">
+          <h5>Contact Us</h5>
+          <p>Email: support@airlinesystem.com</p>
+          <p>Phone: +54 9 11 1234 5678</p>
+        </div>
+      </div>
+
+      <div class="text-center pt-3 border-top border-light">
+        &copy; {{ now|date:"Y" }} Airline System. All rights reserved.
+      </div>
+    </div>
+  </footer>
+</body>
+
+
 
      <!-- Scripts mínimos de Bootstrap -->
      <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
