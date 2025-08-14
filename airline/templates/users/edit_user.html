@@ -1,50 +1,64 @@
 {% extends 'base.html' %}
 
-{% block title %}My profile{% endblock %}
+{% block title %}My Profile{% endblock %}
 
 {% block content %}
-<div class="container mt-5" style="max-width: 600px;">
-  <h2 class="mb-4" style="color: #dc3545;">Edit User: {{ user.username }}</h2>
+<div class="d-flex justify-content-center align-items-center" style="min-height: calc(100vh - 70px);">
+    <!-- Card -->
+    <div class="card shadow" style="max-width: 600px; width: 100%; border-radius: 15px; overflow: hidden; margin-bottom: 50px;">
+        
+        <!-- Encabezado de la card -->
+        <div class="card-header text-white" style="background-color: #577399; padding: 1rem 2rem;">
+            <h4 class="mb-0">Edit User: {{ user.username }}</h4>
+        </div>
 
-  <form method="post" novalidate>
-    {% csrf_token %}
-    
-    <div class="mb-3">
-      <label for="username" class="form-label">Username</label>
-      <input 
-        type="text" 
-        class="form-control" 
-        id="username" 
-        name="username" 
-        value="{{ user.username }}" 
-        required
-      >
+        <!-- Cuerpo de la card -->
+        <div class="card-body" style="background-color: white; padding: 2rem;">
+            <form method="post" novalidate>
+                {% csrf_token %}
+
+                <div class="mb-3">
+                    <label for="username" class="form-label">Username</label>
+                    <input 
+                        type="text" 
+                        class="form-control" 
+                        id="username" 
+                        name="username" 
+                        value="{{ user.username }}" 
+                        required
+                    >
+                </div>
+
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email</label>
+                    <input 
+                        type="email" 
+                        class="form-control" 
+                        id="email" 
+                        name="email" 
+                        value="{{ user.email }}" 
+                        required
+                    >
+                </div>
+
+                <div class="mb-3">
+                    <label for="password" class="form-label">New password</label>
+                    <input 
+                        type="password" 
+                        class="form-control" 
+                        id="password" 
+                        name="password" 
+                        value=""
+                    >
+                </div>
+
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-lg" style="background-color: #41c230; color: white; font-size: 1.1rem;">
+                        Save changes
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
-
-    <div class="mb-3">
-      <label for="email" class="form-label">Email</label>
-      <input 
-        type="email" 
-        class="form-control" 
-        id="email" 
-        name="email" 
-        value="{{ user.email }}" 
-        required
-      >
-    </div>
-
-    <div class="mb-3">
-      <label for="password" class="form-label">New password</label>
-      <input 
-        type="password" 
-        class="form-control" 
-        id="password" 
-        name="password" 
-        value=""
-      >
-    </div>
-
-    <button type="submit" class="btn btn-primary">Save changes</button>
-  </form>
 </div>
 {% endblock %}
