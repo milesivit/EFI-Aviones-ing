@@ -15,7 +15,7 @@ class DevelopersView(View):
         # Renderiza la plantilla "dev.html" cuando se accede por GET
         return render(request, "dev.html")
 
-
+#hola123
 # Vista para cerrar sesión de usuario
 class LogoutView(View):
     def get(self, request):
