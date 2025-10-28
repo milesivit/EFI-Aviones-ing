@@ -109,3 +109,55 @@ class FlightViewSet(AuthAdminView, viewsets.ModelViewSet):
 Gestión de Pasajeros (API)
 """
 
+#Registrar un pasajero. solo para admin papá
+class PassengerViewSet(AuthAdminView, viewsets.ModelViewSet):
+    """
+    CRUD completo de pasajero (solo para admins)
+    - GET /api/passenger-vs/
+    - POST /api/passenger-vs/
+    - GET /api/passenger-vs/{id}/
+    - PUT /api/passenger-vs/{id}/
+    - PATCH /api/passenger-vs/{id}/
+    - DELETE /api/passenger-vs/{id}/
+    """
+    
+    queryset = Passenger.objects.all().order_by("id")
+    serializer_class = PassengerSerializer
+
+#consultar informacion de un pasajero
+class PassengerDetailAPIView(AuthView, RetrieveAPIView):
+    """
+    GET /api/passengerDetail/<pk>/
+    da el detalle de un pasajero
+    accesible para cualquier usuario autenticado
+    """
+    permission_classes = [IsAuthenticated]
+    serializer_class = PassengerSerializer
+    queryset = Passenger.objects.all()
+
+class ReservationByPassengerAPIView(AuthView, ListAPIView):
+    """
+    GET /api/reservationsByPassenger/<int:passenger_id>/
+    devuelve todas las reservas asociadas a un pasajero
+    accesible para cualquier usuario autenticado
+    """
+    permission_classes = [IsAuthenticated]
+    serializer_class = ReservationSerializer
+    pagination_class = LimitOffsetPagination
+
+    def get_queryset(self):
+        passenger_id = self.kwargs.get("passenger_id")
+        #solo reservas del pasajero especificado
+        return Reservation.objects.filter(passenger_id=passenger_id).order_by("-reservation_date")
+    
+#---------------------------------------------------------------------------------------------
+
+"""
+Sistema de Reservas (API)
+"""
+
+#---------------------------------------------------------------------------------------------
+
+"""
+Gestión de Aviones y Asientos (API)
+"""
