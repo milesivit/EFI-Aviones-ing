@@ -3,6 +3,9 @@ black==25.1.0
 charset-normalizer==3.4.3
 click==8.2.1
 Django==5.2.4
+django-filter==25.2
+djangorestframework==3.16.1
+Markdown==3.9
 mypy_extensions==1.1.0
 packaging==25.0
 pathspec==0.12.1
