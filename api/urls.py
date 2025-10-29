@@ -7,12 +7,28 @@ from api.views import (
     FlightFilterAPIView,
     PassengerViewSet,
     PassengerDetailAPIView,
-    ReservationByPassengerAPIView
+    ReservationByPassengerAPIView,
+    CreateReservationAPIView,
+    AvailableSeatsListAPIView,
+    PlaneViewSet,
+    PlaneLayoutAPIView,
+    SeatAvailabilityAPIView,
+    GenerateTicketAPIView,
+    TicketInformationAPIView,
+    PassengersByFlightAPIView,
+    ActiveReservationsByPassengerAPIView,
+)
+
+from drf_spectacular.views import (
+    SpectacularAPIView, 
+    SpectacularRedocView, 
+    SpectacularSwaggerView
 )
 
 router = DefaultRouter()
 router.register("flight-vs", FlightViewSet, basename="flight-vs")
 router.register("passenger-vs", PassengerViewSet, basename="passenger-vs")
+router.register("plane-vs", PlaneViewSet, basename="plane-vs")
 
 urlpatterns = [
     path("", include(router.urls)),
@@ -28,5 +44,52 @@ urlpatterns = [
         PassengerDetailAPIView.as_view(),
         name="passenger-detail",
     ),
-     path('reservationsByPassenger/<int:passenger_id>/', ReservationByPassengerAPIView.as_view(), name='reservations-by-passenger'),
+    path(
+        "reservationsByPassenger/<int:passenger_id>/",
+        ReservationByPassengerAPIView.as_view(),
+        name="reservations-by-passenger",
+    ),
+    path(
+        "createReservation/",
+        CreateReservationAPIView.as_view({"post": "create"}),
+        name="create-reservation",
+    ),
+    path(
+        "availableSeats/<int:flight_id>/",
+        AvailableSeatsListAPIView.as_view(),
+        name="available-seats",
+    ),
+    path(
+        "planeLayout/<int:plane_id>/", PlaneLayoutAPIView.as_view(), name="plane-layout"
+    ),
+    path(
+        "checkSeatAvailability/<int:plane_id>/<str:seat_code>/",
+        SeatAvailabilityAPIView.as_view(),
+        name="seat-availability",
+    ),
+    path(
+        "generateTicket/<int:reservation_id>",
+        GenerateTicketAPIView.as_view(),
+        name="generate-ticket",
+    ),
+    path(
+        "ticketInformation/<str:barcode>",
+        TicketInformationAPIView.as_view(),
+        name="ticket-information",
+    ),
+    path(
+        "passengersByFlight/<int:flight_id>",
+        PassengersByFlightAPIView.as_view(),
+        name="passenger-flight",
+    ),
+    path(
+        "activeReservations/<int:passenger_id>",
+        ActiveReservationsByPassengerAPIView.as_view(),
+        name="active-reservation",
+    ),
+    # YOUR PATTERNS
+    path('schema/', SpectacularAPIView.as_view(), name='schema'),
+    # Optional UI:
+    path('docs/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
+    path('redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
 ]
