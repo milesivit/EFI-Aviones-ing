@@ -17,7 +17,7 @@ class ReservationRepository:
         flight_id: int,
         passenger_id: int,
         seat_id: int,
-        user_id=int,
+        user_id: int,
     ) -> Reservation:
         """
         Crea una nueva reserva.

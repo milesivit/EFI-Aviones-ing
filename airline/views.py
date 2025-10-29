@@ -10,7 +10,7 @@ from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 
 # Modelos internos de la aplicación
-from airline.models import Flight, Plane, Passenger, Reservation, Seat, Ticket
+from airline.models import Flight, Plane, Reservation, Seat
 
 # Formularios internos
 from airline.forms import (
@@ -30,6 +30,7 @@ from airline.services.plane import PlaneService
 from airline.services.reservation import ReservationService
 from airline.services.ticket import TicketService
 from airline.services.user import UserService
+from airline.services.seat import SeatService
 
 # Utilidades internas
 from airline.utils.ticket_pdf import generate_ticket_pdf
@@ -40,15 +41,17 @@ from airline.utils.ticket_pdf import generate_ticket_pdf
 def confirm_reservation(request, flight_id, passenger_id, seat_id):
     # Obtiene el vuelo, pasajero y asiento correspondientes a los IDs proporcionados.
     # Si no existen, devuelve un error 404.
-    flight = get_object_or_404(Flight, id=flight_id)
-    passenger = get_object_or_404(Passenger, id=passenger_id)
-    seat = get_object_or_404(Seat, id=seat_id)
+    try:
+        flight = FlightService.get_by_id(flight_id)
+        passenger = PassengerService.get_by_id(passenger_id)
+        seat = SeatService.get_by_id(seat_id)
+    except ValueError as e:
+        return render(request, "errors/404.html", {"error": str(e)})
 
     # Si el método de la petición es POST, significa que se envió el formulario de confirmación
     if request.method == "POST":
         # Cambia el estado del asiento a "taken" (ocupado) y guarda el cambio
-        seat.status = "taken"
-        seat.save()
+        SeatService.mark_as_taken(seat.id)
 
         # Genera un código de reserva aleatorio de 8 caracteres (letras y números)
         reservation_code = "".join(
@@ -71,14 +74,12 @@ def confirm_reservation(request, flight_id, passenger_id, seat_id):
 
         # Genera un código de barras aleatorio para el ticket
         barcode = "".join(random.choices(string.ascii_uppercase + string.digits, k=12))
-        issue_date = datetime.now()  # Fecha de emisión del ticket
-        status = "active"  # Estado del ticket
 
         # Crea el ticket usando el servicio de tickets
         ticket = TicketService.create(
             barcode=barcode,
-            issue_date=issue_date,
-            status=status,
+            issue_date=datetime.now(),
+            status="active",
             reservation_id=reservation.id,  # Asocia el ticket con la reserva creada
         )
 

@@ -76,3 +76,16 @@ class SeatRepository:
     @staticmethod
     def search_by_number(number: str) -> list[Seat]:
         return Seat.objects.filter(number__icontains=number)
+    
+    @staticmethod
+    def mark_as_taken(seat_id: int) -> Seat:
+        seat = SeatRepository.get_by_id(seat_id)
+        if not seat:
+            raise ValueError("El asiento no existe.")
+
+        if seat.status == "taken":
+            raise ValueError("El asiento ya está ocupado.")
+
+        seat.status = "taken"
+        seat.save()
+        return seat

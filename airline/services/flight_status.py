@@ -33,9 +33,3 @@ class FlightStatusService:
         if flight_status_id:
             return FlightStatusRepository.get_by_id(flight_status_id=flight_status_id)
         return ValueError("El Estado de Vuelo No Existe")
-
-    @staticmethod
-    def search(status: str) -> list[FlightStatus]:
-        if status:
-            return FlightStatusRepository.search_by_satuts(origin=origin)
-        return ValueError("El Estado de Vuelo No Existe")
