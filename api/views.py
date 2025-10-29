@@ -551,6 +551,7 @@ class PassengersByFlightAPIView(AuthView, APIView):
     """
 
     permission_classes = [IsAuthenticated]  # solo autenticados
+    serializer_class = PassengerSerializer
 
     def get(self, request, flight_id):
         try:
@@ -580,6 +581,7 @@ class ActiveReservationsByPassengerAPIView(AuthView, APIView):
     """
 
     permission_classes = [IsAuthenticated]  # solo autenticados
+    serializer_class = ReservationSerializer
 
     def get(self, request, passenger_id):
         try:
