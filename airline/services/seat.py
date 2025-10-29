@@ -66,3 +66,7 @@ class SeatService:
         if number:
             return SeatRepository.search_by_number(number=number)
         return ValueError("El Asiento No Existe")
+    
+    @staticmethod
+    def mark_as_taken(seat_id: int) -> Seat:
+        return SeatRepository.mark_as_taken(seat_id)
