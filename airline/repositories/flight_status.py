@@ -22,47 +22,23 @@ class FlightStatusRepository:
         return flight_status
 
     @staticmethod
-    def delete(flght_status: FlightStatus) -> bool:
+    def delete(flight_status: FlightStatus) -> bool:
         """
-        Elimina una instancia de FlightStatus.
-
-        Args:
-            flght_status (FlightStatus): Instancia del estado de vuelo a eliminar.
-
-        Returns:
-            bool: True si la eliminación fue exitosa.
-
-        Raises:
-            ValueError: Si la instancia no existe.
-
-        Observación:
-            - `True()` está mal, debería ser simplemente `True` (sin paréntesis).
-            - El error que captura es innecesario porque `.delete()` sobre una instancia no lanza `DoesNotExist`.
+        elimina una instancia de flightstatus
         """
-        try:
-            flght_status.delete()
-            return True  # Corregido: era `True()`
-        except FlightStatus.DoesNotExist:
-            raise ValueError("El estado de vuelo no existe")
+        flight_status.delete()
+        return True
+
 
     @staticmethod
-    def update(flight_status: FlightStatus, stauts: str) -> FlightStatus:
+    def update(flight_status: FlightStatus, status: str) -> FlightStatus:
         """
-        Actualiza el estado de una instancia de FlightStatus.
-
-        Args:
-            flight_status (FlightStatus): Instancia a modificar.
-            stauts (str): Nuevo valor del estado.
-
-        Returns:
-            FlightStatus: Instancia actualizada.
-
-        Observación:
-            - Hay un typo: `stauts` debería ser `status`.
+        actualiza una instancia de flightstatus
         """
-        flight_status.status = stauts  # Debería ser `status`
+        flight_status.status = status
         flight_status.save()
         return flight_status
+
 
     @staticmethod
     def get_all() -> list[FlightStatus]:
