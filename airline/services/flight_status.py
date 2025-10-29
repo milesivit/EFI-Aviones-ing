@@ -1,4 +1,4 @@
-from airline.models import FlightStatus
+from airline.models import FlightStatus #esta bien el modelo aca ya que El Service solo recibe o devuelve objetos y llama al Repository para hacer el trabajo real.
 from airline.repositories.flight_status import FlightStatusRepository
 
 
@@ -18,11 +18,11 @@ class FlightStatusService:
 
     @staticmethod
     def update(
-        flight_stauts: FlightStatus,
+        flight_status: FlightStatus,
         status: str,
     ) -> FlightStatus:
-        flight_stauts.status = status
-        return flight_stauts
+        flight_status.status = status
+        return flight_status
 
     @staticmethod
     def get_all() -> list[FlightStatus]:

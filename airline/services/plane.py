@@ -1,4 +1,4 @@
-from airline.models import Plane
+from airline.models import Plane #esta bien el modelo aca ya que El Service solo recibe o devuelve objetos y llama al Repository para hacer el trabajo real.
 from airline.repositories.plane import PlaneRepository
 
 

@@ -1,5 +1,5 @@
 from datetime import date
-from airline.models import Passenger
+from airline.models import Passenger #esta bien el modelo aca ya que El Service solo recibe o devuelve objetos y llama al Repository para hacer el trabajo real.
 from airline.repositories.passenger import PassengerRepository
 
 

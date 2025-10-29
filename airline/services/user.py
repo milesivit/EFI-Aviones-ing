@@ -1,5 +1,5 @@
 from django.contrib.auth.hashers import make_password
-from airline.models import User
+from airline.models import User #esta bien el modelo aca ya que El Service solo recibe o devuelve objetos y llama al Repository para hacer el trabajo real.
 from airline.repositories.user import UserRepository
 
 
