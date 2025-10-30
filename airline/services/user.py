@@ -12,8 +12,10 @@ class UserService:
         )
 
         if role == "admin":
-            user.is_staff = True
-            user.save()
+            # Llamamos a un nuevo método del Repository para guardar el cambio
+            # Nota: Podrías usar el método 'update' existente si lo adaptas,
+            # o crear uno específico para este tipo de lógica.
+            return UserRepository.update_staff_status(user=user, is_staff=True)
 
         return user
 

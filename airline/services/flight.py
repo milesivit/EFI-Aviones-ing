@@ -48,18 +48,19 @@ class FlightService:
         base_price: float,
         plane_id: int,
         user_ids: list[int],
-    ) -> Flight:
-        flight.origin = origin
-        flight.destination = destination
-        flight.departure_date = departure_date
-        flight.arrival_date = arrival_date
-        flight.duration = duration
-        flight.status = status
-        flight.base_price = base_price
-        flight.plane_id = plane_id
-        flight.user_id.set(user_ids)
-        flight.save()
-        return flight
+    ) -> Flight: 
+        return FlightRepository.update(
+            flight=flight, 
+            origin=origin, 
+            destination=destination,
+            departure_date=departure_date,
+            arrival_date=arrival_date,
+            duration=duration,
+            status=status,
+            base_price=base_price,
+            plane_id=plane_id,
+            user_id=user_ids
+            )
 
     @staticmethod
     def get_all() -> list[Flight]:
