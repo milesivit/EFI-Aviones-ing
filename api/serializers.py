@@ -9,7 +9,9 @@ from airline.models import (
     Ticket,
 )
 from rest_framework import serializers
-
+from airline.services.plane import PlaneService
+from airline.services.flight_status import FlightStatusService
+from airline.services.passenger import PassengerService
 
 class UserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=True)
@@ -50,24 +52,56 @@ class UserSerializer(serializers.ModelSerializer):
         return instance
 
 
-class PlaneSerializer(
-    serializers.ModelSerializer
-):  # modelserializer ya te hace el create y el update por detras
-    class Meta:  # al no necesitar logica personalizada se puede poner asi de lleno, no es como usuario
-        model = Plane
-        fields = [
-            "id",
-            "model",
-            "capacity",
-            "rows",
-            "columns",
-        ]  # lista de campos que el serializer expondra
+class PlaneSerializer(serializers.Serializer):
+    id = serializers.IntegerField(read_only=True)
+    model = serializers.CharField(max_length=100)
+    capacity = serializers.IntegerField()
+    rows = serializers.IntegerField()
+    columns = serializers.IntegerField()
 
+    def create(self, validated_data) -> "Plane":
+        """
+        crea un nuevo avion usando PlaneService
+        """
+        return PlaneService.create(
+            model=validated_data["model"],
+            capacity=validated_data["capacity"],
+            rows=validated_data["rows"],
+            columns=validated_data["columns"],
+        )
 
-class FlightStatusSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = FlightStatus
-        fields = ["id", "status"]  # lista de campos que el serializer expondra
+    def update(self, instance: "Plane", validated_data) -> "Plane":
+        """
+        actualiza un avion existente usando PlaneService
+        """
+        PlaneService.update(
+            plane_id=instance.id,
+            model=validated_data.get("model", instance.model),
+            capacity=validated_data.get("capacity", instance.capacity),
+            rows=validated_data.get("rows", instance.rows),
+            columns=validated_data.get("columns", instance.columns),
+        )
+        #devuelve el objeto actualizado
+        return PlaneService.get_by_id(instance.id)
+
+class FlightStatusSerializer(serializers.Serializer):
+    id = serializers.IntegerField(read_only=True)
+    status = serializers.CharField(max_length=50)
+
+    def create(self, validated_data) -> "FlightStatus": #forward reference, y no necesita importar el modelo.
+        """
+        crea un estado de vuelo usando FlightStatusService
+        """
+        return FlightStatusService.create(status=validated_data["status"])
+
+    def update(self, instance: "FlightStatus", validated_data) -> "FlightStatus":
+        """
+        actualiza un estado de vuelo existente usando FlightStatusService
+        """
+        return FlightStatusService.update(
+            flight_status=instance,
+            status=validated_data.get("status", instance.status),
+        )
 
 
 class FlightSerializer(serializers.ModelSerializer):
@@ -108,20 +142,42 @@ class FlightSerializer(serializers.ModelSerializer):
         ]
 
 
-class PassengerSerializer(
-    serializers.ModelSerializer
-):  # modelserializer ya te hace el create y el update por detras
-    class Meta:
-        model = Passenger
-        fields = [
-            "id",
-            "name",
-            "document",
-            "document_type",
-            "email",
-            "phone",
-            "birth_date",
-        ]  # lista de campos que el serializer expondra
+class PassengerSerializer(serializers.Serializer):
+    id = serializers.IntegerField(read_only=True)
+    name = serializers.CharField(max_length=100)
+    document = serializers.CharField(max_length=50)
+    document_type = serializers.CharField(max_length=50)
+    email = serializers.EmailField()
+    phone = serializers.CharField(max_length=50)
+    birth_date = serializers.DateField()
+
+    def create(self, validated_data) -> "Passenger":
+        """
+        Crea un pasajero con service
+        """
+        return PassengerService.create(
+            name=validated_data["name"],
+            document=validated_data["document"],
+            document_type=validated_data["document_type"],
+            email=validated_data["email"],
+            phone=validated_data["phone"],
+            birth_date=validated_data["birth_date"],
+        )
+
+    def update(self, instance: "Passenger", validated_data) -> "Passenger":
+        """
+        actualiza un pasajero
+        """
+        return PassengerService.update(
+            passenger=instance,
+            name=validated_data.get("name", instance.name),
+            document=validated_data.get("document", instance.document),
+            document_type=validated_data.get("document_type", instance.document_type),
+            email=validated_data.get("email", instance.email),
+            phone=validated_data.get("phone", instance.phone),
+            birth_date=validated_data.get("birth_date", instance.birth_date),
+        )
+
 
 
 class SeatSerializer(serializers.ModelSerializer):

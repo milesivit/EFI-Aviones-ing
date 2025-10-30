@@ -10,13 +10,14 @@ from api.views import (
     ReservationByPassengerAPIView,
     CreateReservationAPIView,
     AvailableSeatsListAPIView,
-    PlaneViewSet,
     PlaneLayoutAPIView,
     SeatAvailabilityAPIView,
     GenerateTicketAPIView,
     TicketInformationAPIView,
     PassengersByFlightAPIView,
     ActiveReservationsByPassengerAPIView,
+    PlaneAPIView,
+    PlaneDetailAPIView
 )
 
 from drf_spectacular.views import (
@@ -28,7 +29,6 @@ from drf_spectacular.views import (
 router = DefaultRouter()
 router.register("flight-vs", FlightViewSet, basename="flight-vs")
 router.register("passenger-vs", PassengerViewSet, basename="passenger-vs")
-router.register("plane-vs", PlaneViewSet, basename="plane-vs")
 
 urlpatterns = [
     path("", include(router.urls)),
@@ -87,6 +87,8 @@ urlpatterns = [
         ActiveReservationsByPassengerAPIView.as_view(),
         name="active-reservation",
     ),
+    path('plane/', PlaneAPIView.as_view(), name='plane-list-create'),
+    path('plane/<int:pk>/', PlaneDetailAPIView.as_view(), name='plane-detail'),
     # YOUR PATTERNS
     path('schema/', SpectacularAPIView.as_view(), name='schema'),
     # Optional UI:
