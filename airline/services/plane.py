@@ -32,16 +32,18 @@ class PlaneService:
         capacity: int,
         rows: int,
         columns: int,
-    ) -> bool:
+    ) -> Plane: 
         plane = PlaneRepository.get_by_id(plane_id=plane_id)
         if plane:
-            PlaneRepository.update(
+            return PlaneRepository.update(
                 plane=plane,
                 model=model,
                 capacity=capacity,
                 rows=rows,
                 columns=columns,
             )
+        raise ValueError("El avión no existe")  # opcional: manejar caso no encontrado
+
 
     @staticmethod
     def get_all() -> list[Plane]:

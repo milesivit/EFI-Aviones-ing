@@ -31,11 +31,10 @@ from api.permissions import TokenPermission
 from rest_framework import status
 from django.utils.crypto import get_random_string
 from rest_framework.pagination import LimitOffsetPagination
-from drf_spectacular.utils import extend_schema, OpenApiParameter
-from django.utils import timezone
 from rest_framework.response import Response
 
 from airline.services.plane import PlaneService
+from airline.services.flight import FlightService
 
 """
 Gestión de Vuelos (API)
@@ -44,7 +43,7 @@ Gestión de Vuelos (API)
 # Listar todos los vuelos disponibles.
 class FlightAvailableListAPIView(AuthView, ListAPIView):
     """
-    /api/flightAvailable/ url
+    GET /api/flightAvailable/
     filtra los vuelos disponibles que seal mayor a la fecha de hoy
     """
 
@@ -52,10 +51,8 @@ class FlightAvailableListAPIView(AuthView, ListAPIView):
     serializer_class = FlightSerializer
 
     def get_queryset(self):
-        return Flight.objects.filter(departure_date__gt=timezone.now()).order_by(
-            "departure_date"
-        )
-
+        return FlightService.get_upcoming_flights()
+    
 
 # Obtener detalle de un vuelo.
 class FlightDetailAPIView(AuthView, RetrieveAPIView):
@@ -67,7 +64,14 @@ class FlightDetailAPIView(AuthView, RetrieveAPIView):
 
     permission_classes = [IsAuthenticated]
     serializer_class = FlightSerializer
-    queryset = Flight.objects.all()
+
+    def get_object(self):
+        flight_id = self.kwargs.get("pk")
+        try:
+            return FlightService.get_by_id(flight_id)
+        except Flight.DoesNotExist:
+            from rest_framework.exceptions import NotFound
+            raise NotFound(detail="Flight not found")
 
 
 # filtrar vuelos por origen, destino y fecha.
@@ -84,20 +88,11 @@ class FlightFilterAPIView(AuthView, ListAPIView):
     pagination_class = LimitOffsetPagination
 
     def get_queryset(self):
-        qs = Flight.objects.all()
-
         origin = self.request.query_params.get("origin")
         destination = self.request.query_params.get("destination")
         date = self.request.query_params.get("date")
 
-        if origin:
-            qs = qs.filter(origin__icontains=origin)
-        if destination:
-            qs = qs.filter(destination__icontains=destination)
-        if date:
-            qs = qs.filter(departure_date__date=date)
-
-        return qs
+        return FlightService.filter_flights(origin, destination, date)
 
 
 # Crear, editar y eliminar vuelos (solo administradores).
@@ -338,56 +333,19 @@ Gestión de Aviones y Asientos (API)
 """
 
 #Listar aviones registrados.
-class PlaneAPIView(AuthAdminView, APIView):
+class PlaneViewSet(AuthAdminView, viewsets.ModelViewSet):
     """
-    lista y administra aviones (solo admins) SIN ID
+    CRUD completo de vuelos (solo para admins)
+    - GET /api/plane-vs/
+    - POST /api/plane-vs/
+    - GET /api/plane-vs/{id}/
+    - PUT /api/plane-vs/{id}/
+    - PATCH /api/plane-vs/{id}/
+    - DELETE /api/plane-vs/{id}/
     """
 
+    queryset = Plane.objects.all().order_by("id")
     serializer_class = PlaneSerializer
-    permission_classes = [IsAdminUser]
-
-    def get(self, request):
-        planes = PlaneService.get_all()
-        serializer = PlaneSerializer(planes, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-    def post(self, request):
-        serializer = PlaneSerializer(data=request.data)
-        if serializer.is_valid():
-            plane = serializer.save()
-            return Response(PlaneSerializer(plane).data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-class PlaneDetailAPIView(AuthAdminView, APIView):
-    """
-    obtener, actualizar o eliminar un avión por id
-    """
-
-    serializer_class = PlaneSerializer
-    permission_classes = [IsAdminUser]
-
-    def get_object(self, pk: int):
-        return PlaneService.get_by_id(pk)
-    
-    def get(self, request, pk: int):
-        plane = self.get_object(pk)
-        if plane:
-            serializer = PlaneSerializer(plane)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response({"error": "El avión no existe"}, status=status.HTTP_404_NOT_FOUND)
-
-    def put(self, request, pk: int):
-        plane = self.get_object(pk)
-        serializer = PlaneSerializer(plane, data=request.data)
-        serializer.is_valid(raise_exception=True)
-        updated_plane = serializer.save()
-        return Response(PlaneSerializer(updated_plane).data)
-
-    def delete(self, request, pk: int):
-        deleted = PlaneService.delete(pk)
-        if deleted:
-            return Response(status=status.HTTP_204_NO_CONTENT)
-        return Response({"error": "El avión no existe"}, status=status.HTTP_404_NOT_FOUND)
 
 
 # obtener layout de asientos de avion
