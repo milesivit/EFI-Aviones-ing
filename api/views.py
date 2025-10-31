@@ -6,6 +6,7 @@ from airline.models import (
     Seat,
     Reservation,
     Ticket,
+    FlightStatus
 )
 
 from api.serializers import (
@@ -15,6 +16,8 @@ from api.serializers import (
     SeatSerializer,
     ReservationSerializer,
     TicketSerializer,
+    UserSerializer,
+    FlightStatusSerializer
 )
 
 from rest_framework import viewsets
@@ -89,7 +92,7 @@ class FlightFilterAPIView(AuthView, ListAPIView): #TODO se ve mal en swagger
 
     permission_classes = [IsAuthenticated]
     serializer_class = FlightSerializer
-    pagination_class = LimitOffsetPagination
+    pagination_class = None
 
     def get_queryset(self):
         origin = self.request.query_params.get("origin")
@@ -177,11 +180,10 @@ Sistema de Reservas (API)
 
 
 # Crear una reserva para un pasajero en un vuelo.
-class CreateReservationAPIView(AuthAdminView, viewsets.ViewSet): #TODO NO ANDA NADA 
+class CreateReservationAPIView(AuthAdminView, viewsets.ViewSet):
     """
     POST /api/createReservation/
     crea una reserva para un pasajero en un vuelo solo para admin,
-    NO HACE FALTA QUE PONGAS ALGO EN LOS CAMPOS STATUS, PRICE Y RESERVATION CODE,
     el asiento debe estar disponible
     """
 
@@ -272,13 +274,14 @@ class AvailableSeatsListAPIView(AuthView, ListAPIView):
 
 
 # cambiar estado de una reserva solo admin
-class ChangeReservationStatusAPIView(AuthAdminView, APIView): #TODO NO ANDA EL PATCH
+class ChangeReservationStatusAPIView(AuthAdminView, APIView):
     """
     PATCH /api/changeReservationStatus/<int:reservation_id>/
     Permite que un administrador cambie el estado de una reserva.
     """
 
     permission_classes = [IsAdminUser]
+    serializer_class = ReservationSerializer
 
     def get(self, request, reservation_id=None):
         """
@@ -378,6 +381,7 @@ class SeatAvailabilityAPIView(AuthView, RetrieveAPIView):
     """
 
     permission_classes = [IsAuthenticated]
+    serializer_class = SeatSerializer
 
     def get(self, request, plane_id, seat_code):
         data = SeatService.check_availability(plane_id, seat_code)
@@ -454,6 +458,7 @@ class TicketInformationAPIView(AuthView, RetrieveAPIView):
     """
 
     permission_classes = [IsAuthenticated]
+    serializer_class = TicketSerializer
 
     def get(self, request, barcode):
         data = TicketService.get_ticket_info(barcode)
@@ -477,6 +482,7 @@ class PassengersByFlightAPIView(AuthView, APIView):
     """
 
     permission_classes = [IsAuthenticated]
+    serializer_class = ReservationSerializer
 
     def get(self, request, flight_id):
         passengers = ReservationService.get_passengers_by_flight(flight_id)
@@ -494,6 +500,7 @@ class ActiveReservationsByPassengerAPIView(AuthView, APIView):
     """
 
     permission_classes = [IsAuthenticated]
+    serializer_class = PassengerSerializer
 
     def get(self, request, passenger_id):
         active_reservations = PassengerService.get_active_reservations(passenger_id)
@@ -502,3 +509,63 @@ class ActiveReservationsByPassengerAPIView(AuthView, APIView):
 
         serializer = ReservationSerializer(active_reservations, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+"""
+CRUDS
+"""
+
+class UserViewSet(AuthAdminView, viewsets.ModelViewSet):
+    """
+    CRUD completo de users (solo para admins)
+    - GET /api/user-vs/
+    - POST /api/user-vs/
+    - GET /api/user-vs/{id}/
+    - PUT /api/user-vs/{id}/
+    - PATCH /api/user-vs/{id}/
+    - DELETE /api/user-vs/{id}/
+    """
+
+    queryset = User.objects.all().order_by("id")
+    serializer_class = UserSerializer
+
+class FlightStatusViewSet(AuthAdminView, viewsets.ModelViewSet):
+    """
+    CRUD completo de flightStatus (solo para admins)
+    - GET /api/flightStatus-vs/
+    - POST /api/flightStatus-vs/
+    - GET /api/flightStatus-vs/{id}/
+    - PUT /api/flightStatus-vs/{id}/
+    - PATCH /api/flightStatus-vs/{id}/
+    - DELETE /api/flightStatus-vs/{id}/
+    """
+
+    queryset = FlightStatus.objects.all().order_by("id")
+    serializer_class = FlightStatusSerializer
+
+class ReservationViewSet(AuthAdminView, viewsets.ModelViewSet):
+    """
+    CRUD completo de reservation (solo para admins)
+    - GET /api/reservation-vs/
+    - POST /api/reservation-vs/
+    - GET /api/reservation-vs/{id}/
+    - PUT /api/reservation-vs/{id}/
+    - PATCH /api/reservation-vs/{id}/
+    - DELETE /api/reservation-vs/{id}/
+    """
+
+    queryset = Reservation.objects.all().order_by("id")
+    serializer_class = ReservationSerializer
+
+class TicketViewSet(AuthAdminView, viewsets.ModelViewSet):
+    """
+    CRUD completo de ticket (solo para admins)
+    - GET /api/ticket-vs/
+    - POST /api/ticket-vs/
+    - GET /api/ticket-vs/{id}/
+    - PUT /api/ticket-vs/{id}/
+    - PATCH /api/ticket-vs/{id}/
+    - DELETE /api/ticket-vs/{id}/
+    """
+
+    queryset = Ticket.objects.all().order_by("id")
+    serializer_class = TicketSerializer

@@ -17,7 +17,11 @@ from api.views import (
     PassengersByFlightAPIView,
     ActiveReservationsByPassengerAPIView,
     PlaneViewSet,
-    ChangeReservationStatusAPIView
+    ChangeReservationStatusAPIView,
+    UserViewSet,
+    FlightStatusViewSet,
+    ReservationViewSet,
+    TicketViewSet
 )
 
 from drf_spectacular.views import (
@@ -30,6 +34,10 @@ router = DefaultRouter()
 router.register("flight-vs", FlightViewSet, basename="flight-vs")
 router.register("passenger-vs", PassengerViewSet, basename="passenger-vs")
 router.register("plane-vs", PlaneViewSet, basename="plane-vs")
+router.register("user-vs", UserViewSet, basename="user-vs")
+router.register("flightStatus-vs", FlightStatusViewSet, basename="flightStatus-vs")
+router.register("reservation-vs", ReservationViewSet, basename="reservation-vs")
+router.register("ticket-vs", TicketViewSet, basename="ticket-vs")
 
 urlpatterns = [
     path("", include(router.urls)),
