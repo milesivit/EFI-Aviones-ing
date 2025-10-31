@@ -89,3 +89,17 @@ class SeatRepository:
         seat.status = "taken"
         seat.save()
         return seat
+    
+    @staticmethod
+    def get_available_by_plane(plane_id: int) -> list[Seat]:
+        return Seat.objects.filter(
+            plane_id=plane_id,
+            status__in=["available", "disponible"]
+        ).order_by("id")
+    
+    @staticmethod
+    def get_seat_by_plane_and_code(plane_id: int, seat_code: str) -> Seat | None:
+        try:
+            return Seat.objects.get(plane_id=plane_id, number__iexact=seat_code)
+        except Seat.DoesNotExist:
+            return None

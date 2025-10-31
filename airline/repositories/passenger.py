@@ -1,5 +1,5 @@
 from datetime import date
-from airline.models import Passenger
+from airline.models import Passenger, Reservation
 
 
 class PassengerRepository:
@@ -131,3 +131,14 @@ class PassengerRepository:
             Lista de pasajeros cuyo nombre contenga el texto buscado.
         """
         return Passenger.objects.filter(name__icontains=name)
+    
+    @staticmethod
+    def get_passenger_by_id(passenger_id: int) -> Passenger | None:
+        try:
+            return Passenger.objects.get(pk=passenger_id)
+        except Passenger.DoesNotExist:
+            return None
+
+    @staticmethod
+    def get_active_reservations(passenger: Passenger):
+        return Reservation.objects.filter(passenger=passenger, status="confirmed")

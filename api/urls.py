@@ -16,7 +16,8 @@ from api.views import (
     TicketInformationAPIView,
     PassengersByFlightAPIView,
     ActiveReservationsByPassengerAPIView,
-    PlaneViewSet
+    PlaneViewSet,
+    ChangeReservationStatusAPIView
 )
 
 from drf_spectacular.views import (
@@ -53,6 +54,11 @@ urlpatterns = [
         "createReservation/",
         CreateReservationAPIView.as_view({"post": "create"}),
         name="create-reservation",
+    ),
+    path(
+        "changeReservationStatus/<int:reservation_id>/",
+        ChangeReservationStatusAPIView.as_view(),
+        name="change-reservation-status",
     ),
     path(
         "availableSeats/<int:flight_id>/",

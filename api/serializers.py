@@ -18,45 +18,6 @@ from airline.services.seat import SeatService
 from airline.services.reservation import ReservationService
 from airline.services.ticket import TicketService
 
-class UserSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True, required=True)
-
-    class Meta:  # la clase Meta indica a DRF que modelo usar para generar los campos
-        model = User
-        fields = [
-            "id",
-            "username",
-            "email",
-            "role",
-            "is_active",
-            "is_staff",
-            "password",
-        ]  # lista de campos que el serializer expondra
-
-    def create(
-        self, validated_data
-    ):  # metodo que sobrescribís para controlar cómo crear una instancia de User cuando el serializer recibe datos validos
-        password = validated_data.pop(
-            "password", None
-        )  # se extrae la clave de validated_data, pop devuelve el valor si existe; si no, devuelve None, evita que la contra quede en validated_data
-        user = User.objects.create_user(
-            password=password, **validated_data
-        )  # usa el metodo de create_user para hacer todo el laburo
-        return user
-
-    def update(self, instance, validated_data):
-        password = validated_data.pop("password", None)
-
-        for attr, value in validated_data.items():
-            setattr(instance, attr, value)
-
-        if password:
-            instance.set_password(password)  # encripta correctamente la nueva contr
-
-        instance.save()
-        return instance
-
-
 class PlaneSerializer(serializers.ModelSerializer):
     """
     Serializer del modelo Plane.
@@ -306,6 +267,44 @@ class SeatSerializer(serializers.ModelSerializer):
             status=validated_data.get("status", instance.status),
             plane_id=validated_data.get("plane", instance.plane).id,
         )
+    
+class UserSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True, required=True)
+
+    class Meta:  # la clase Meta indica a DRF que modelo usar para generar los campos
+        model = User
+        fields = [
+            "id",
+            "username",
+            "email",
+            "role",
+            "is_active",
+            "is_staff",
+            "password",
+        ]  # lista de campos que el serializer expondra
+
+    def create(
+        self, validated_data
+    ):  # metodo que sobrescribís para controlar cómo crear una instancia de User cuando el serializer recibe datos validos
+        password = validated_data.pop(
+            "password", None
+        )  # se extrae la clave de validated_data, pop devuelve el valor si existe; si no, devuelve None, evita que la contra quede en validated_data
+        user = User.objects.create_user(
+            password=password, **validated_data
+        )  # usa el metodo de create_user para hacer todo el laburo
+        return user
+
+    def update(self, instance, validated_data):
+        password = validated_data.pop("password", None)
+
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+
+        if password:
+            instance.set_password(password)  # encripta correctamente la nueva contr
+
+        instance.save()
+        return instance
 
 
 class ReservationSerializer(serializers.ModelSerializer):

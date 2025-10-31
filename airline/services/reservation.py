@@ -86,3 +86,20 @@ class ReservationService:
     @staticmethod
     def get_by_flight(flight_id: int) -> list[Reservation]:
         return ReservationRepository.get_by_flight(flight_id=flight_id)
+    
+    @staticmethod
+    def get_by_passenger(passenger_id: int):
+        """
+        devuelve todas las reservas asociadas a un pasajero usando el repo
+        """
+        return ReservationRepository.get_by_passenger(passenger_id)
+    
+    @staticmethod
+    def get_passengers_by_flight(flight_id: int):
+        flight = ReservationRepository.get_flight_by_id(flight_id)
+        if not flight:
+            return None  # la view decide 404
+
+        reservations = ReservationRepository.get_confirmed_reservations_by_flight(flight)
+        passengers = [res.passenger for res in reservations]
+        return passengers

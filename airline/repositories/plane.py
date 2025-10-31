@@ -1,4 +1,4 @@
-from airline.models import Plane
+from airline.models import Plane, Seat
 
 
 class PlaneRepository:
@@ -118,3 +118,14 @@ class PlaneRepository:
             return Plane.objects.filter(model__icontains=model)
         except Plane.DoesNotExist:
             return None
+        
+    @staticmethod
+    def get_plane_by_id(plane_id: int) -> Plane | None:
+        try:
+            return Plane.objects.get(pk=plane_id)
+        except Plane.DoesNotExist:
+            return None
+
+    @staticmethod
+    def get_seats_by_plane(plane: Plane):
+        return Seat.objects.filter(plane=plane).order_by("row", "column")

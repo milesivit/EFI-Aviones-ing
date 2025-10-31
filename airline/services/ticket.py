@@ -87,3 +87,20 @@ class TicketService:
         if tickets:
             return tickets
         raise ValueError("No se encontraron tickets con ese código de barras")
+    
+    @staticmethod
+    def get_ticket_info(barcode: str):
+        ticket = TicketRepository.get_ticket_by_barcode(barcode)
+        if not ticket:
+            return None  # la view decide si lanza 404
+
+        return {
+            "barcode": ticket.barcode,
+            "status": ticket.status,
+            "reservation": {
+                "id": ticket.reservation.id,
+                "status": ticket.reservation.status,
+                "passenger": str(ticket.reservation.passenger),
+                "flight": str(ticket.reservation.flight),
+            },
+        }

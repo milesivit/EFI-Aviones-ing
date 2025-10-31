@@ -60,3 +60,30 @@ class PlaneService:
         if model:
             return PlaneRepository.search_by_model(model=model)
         return ValueError("El Avion No Existe")
+    
+    @staticmethod
+    def get_plane_layout(plane_id: int):
+        plane = PlaneRepository.get_plane_by_id(plane_id)
+        if not plane:
+            return None  
+
+        seats = PlaneRepository.get_seats_by_plane(plane)
+
+        layout = []
+        for r in range(1, plane.rows + 1):
+            row_seats = seats.filter(row=r)
+            layout.append([
+                {
+                    "number": seat.number,
+                    "seat_type": seat.seat_type,
+                    "status": seat.status,
+                }
+                for seat in row_seats
+            ])
+
+        return {
+            "plane": str(plane),
+            "rows": plane.rows,
+            "columns": plane.columns,
+            "layout": layout,
+        }
