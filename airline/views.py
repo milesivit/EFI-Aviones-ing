@@ -414,7 +414,7 @@ def plane_list(request):
 
 def plane_detail(request, plane_id):
     # Obtiene el avión correspondiente al ID proporcionado o lanza 404 si no existe
-    plane = PlaneService.get_by_id(pk=plane_id)
+    plane = PlaneService.get_by_id(plane_id=plane_id)
 
     # Número de filas y columnas del avión
     rows = plane.rows
@@ -641,7 +641,7 @@ def flight_administration(request):
                     duration=cd["arrival_date"] - cd["departure_date"],
                     base_price=cd["base_price"],
                     status=cd["status_id"],
-                    plane=cd["plane_id"],
+                    plane_id=cd["plane_id"],
                 )
                 return redirect("flight_administration")  # Redirige a la misma vista
             else:
