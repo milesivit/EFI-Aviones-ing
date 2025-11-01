@@ -1,29 +1,28 @@
 from airline.models import (
     User,
     Plane,
-    FlightStatus,
     Flight,
     Passenger,
     Seat,
     Reservation,
     Ticket,
+    FlightStatus
 )
 
 from api.serializers import (
-    UserSerializer,
     PlaneSerializer,
     FlightSerializer,
-    FlightStatusSerializer,
     PassengerSerializer,
     SeatSerializer,
     ReservationSerializer,
     TicketSerializer,
+    UserSerializer,
+    FlightStatusSerializer
 )
 
 from rest_framework import viewsets
 from rest_framework.generics import (
     ListAPIView,
-    RetrieveUpdateDestroyAPIView,
     RetrieveAPIView,
 )
 
@@ -35,8 +34,14 @@ from api.permissions import TokenPermission
 from rest_framework import status
 from django.utils.crypto import get_random_string
 from rest_framework.pagination import LimitOffsetPagination
-from django.utils import timezone
 from rest_framework.response import Response
+
+from airline.services.plane import PlaneService
+from airline.services.flight import FlightService
+from airline.services.passenger import PassengerService
+from airline.services.reservation import ReservationService
+from airline.services.seat import SeatService
+from airline.services.ticket import TicketService
 
 """
 Gestión de Vuelos (API)
@@ -45,7 +50,7 @@ Gestión de Vuelos (API)
 # Listar todos los vuelos disponibles.
 class FlightAvailableListAPIView(AuthView, ListAPIView):
     """
-    /api/flightAvailable/ url
+    GET /api/flightAvailable/
     filtra los vuelos disponibles que seal mayor a la fecha de hoy
     """
 
@@ -53,10 +58,8 @@ class FlightAvailableListAPIView(AuthView, ListAPIView):
     serializer_class = FlightSerializer
 
     def get_queryset(self):
-        return Flight.objects.filter(departure_date__gt=timezone.now()).order_by(
-            "departure_date"
-        )
-
+        return FlightService.get_upcoming_flights()
+    
 
 # Obtener detalle de un vuelo.
 class FlightDetailAPIView(AuthView, RetrieveAPIView):
@@ -68,11 +71,18 @@ class FlightDetailAPIView(AuthView, RetrieveAPIView):
 
     permission_classes = [IsAuthenticated]
     serializer_class = FlightSerializer
-    queryset = Flight.objects.all()
+
+    def get_object(self):
+        flight_id = self.kwargs.get("pk")
+        try:
+            return FlightService.get_by_id(flight_id)
+        except Flight.DoesNotExist:
+            from rest_framework.exceptions import NotFound
+            raise NotFound(detail="Flight not found")
 
 
 # filtrar vuelos por origen, destino y fecha.
-class FlightFilterAPIView(AuthView, ListAPIView):
+class FlightFilterAPIView(AuthView, ListAPIView): #TODO se ve mal en swagger
     """
     GET /api/flightFilter/?origin=<ciudad>&destination=<ciudad>&date=<YYYY-MM-DD>
     ejemplo de url= /api/flightFilter/?origin=Tokio&destination=Nagoya
@@ -82,26 +92,17 @@ class FlightFilterAPIView(AuthView, ListAPIView):
 
     permission_classes = [IsAuthenticated]
     serializer_class = FlightSerializer
-    pagination_class = LimitOffsetPagination
+    pagination_class = None
 
     def get_queryset(self):
-        qs = Flight.objects.all()
-
         origin = self.request.query_params.get("origin")
         destination = self.request.query_params.get("destination")
         date = self.request.query_params.get("date")
 
-        if origin:
-            qs = qs.filter(origin__icontains=origin)
-        if destination:
-            qs = qs.filter(destination__icontains=destination)
-        if date:
-            qs = qs.filter(departure_date__date=date)
-
-        return qs
+        return FlightService.filter_flights(origin, destination, date)
 
 
-# Crear, editar y eliminar vuelos (solo administradores).
+#crear, editar y eliminar vuelos (solo administradores).
 class FlightViewSet(AuthAdminView, viewsets.ModelViewSet):
     """
     CRUD completo de vuelos (solo para admins)
@@ -123,8 +124,7 @@ class FlightViewSet(AuthAdminView, viewsets.ModelViewSet):
 Gestión de Pasajeros (API)
 """
 
-
-# Registrar un pasajero. solo para admin papá
+#registrar un pasajero. solo para admin papá
 class PassengerViewSet(AuthAdminView, viewsets.ModelViewSet):
     """
     CRUD completo de pasajero (solo para admins)
@@ -145,31 +145,31 @@ class PassengerDetailAPIView(AuthView, RetrieveAPIView):
     """
     GET /api/passengerDetail/<pk>/
     da el detalle de un pasajero
-    accesible para cualquier usuario autenticado
+    Accesible para cualquier usuario autenticado
     """
 
     permission_classes = [IsAuthenticated]
     serializer_class = PassengerSerializer
-    queryset = Passenger.objects.all()
 
+    def get_object(self):
+        passenger_id = self.kwargs.get("pk")
+        return PassengerService.get_by_id(passenger_id)
 
+#listas reservas asociadas a un pasajero
 class ReservationByPassengerAPIView(AuthView, ListAPIView):
     """
     GET /api/reservationsByPassenger/<int:passenger_id>/
-    devuelve todas las reservas asociadas a un pasajero
-    accesible para cualquier usuario autenticado
+    Devuelve todas las reservas asociadas a un pasajero.
+    Accesible para cualquier usuario autenticado.
     """
 
     permission_classes = [IsAuthenticated]
     serializer_class = ReservationSerializer
-    pagination_class = LimitOffsetPagination
+    pagination_class = None
 
     def get_queryset(self):
         passenger_id = self.kwargs.get("passenger_id")
-        # solo reservas del pasajero especificado
-        return Reservation.objects.filter(passenger_id=passenger_id).order_by(
-            "-reservation_date"
-        )
+        return ReservationService.get_by_passenger(passenger_id)
 
 
 # ---------------------------------------------------------------------------------------------
@@ -184,7 +184,6 @@ class CreateReservationAPIView(AuthAdminView, viewsets.ViewSet):
     """
     POST /api/createReservation/
     crea una reserva para un pasajero en un vuelo solo para admin,
-    NO HACE FALTA QUE PONGAS ALGO EN LOS CAMPOS STATUS, PRICE Y RESERVATION CODE,
     el asiento debe estar disponible
     """
 
@@ -261,74 +260,75 @@ class CreateReservationAPIView(AuthAdminView, viewsets.ViewSet):
 class AvailableSeatsListAPIView(AuthView, ListAPIView):
     """
     GET /api/availableSeats/<int:flight_id>/
-    devuelve los asientos disponibles de un vuelo indicado
-    (segun el avion asociado al vuelo)
+    Devuelve los asientos disponibles de un vuelo indicado
+    según el avión asociado al vuelo.
     """
 
-    permission_classes = [IsAuthenticated]  # solo para los autenticados
-    serializer_class = SeatSerializer  # trae el serializer
-    pagination_class = (
-        LimitOffsetPagination  # activa la paginacion si hay muchos resultados
-    )
+    permission_classes = [IsAuthenticated]
+    serializer_class = SeatSerializer
+    pagination_class = LimitOffsetPagination
 
     def get_queryset(self):
-        flight_id = self.kwargs.get(
-            "flight_id"
-        )  # es para pasarle a la url flight_id ya q necesita el id
-
-        try:
-            flight = Flight.objects.get(pk=flight_id)
-        except Flight.DoesNotExist:
-            # retornar queryset vacio si no existe el vuelo
-            return Seat.objects.none()
-
-        # obtiene el avion del vuelo
-        plane = flight.plane
-
-        # devuelve solo los asientos disponibles
-        return Seat.objects.filter(
-            plane=plane, status__in=["available", "disponible"]
-        ).order_by("id")
+        flight_id = self.kwargs.get("flight_id")
+        return SeatService.get_available_seats_by_flight(flight_id)
 
 
 # cambiar estado de una reserva solo admin
-class ChangeReservationStatusAPIView(AuthAdminView, viewsets.ViewSet):
+class ChangeReservationStatusAPIView(AuthAdminView, APIView):
     """
     PATCH /api/changeReservationStatus/<int:reservation_id>/
-    hace que un administrador pueda cambiar el estado de una reserva
-    ejemplo:
-    {
-        "status": "denied"
-    }
+    Permite que un administrador cambie el estado de una reserva.
     """
 
-    permission_classes = [IsAdminUser]  # solo admin
-    serializer_class = ReservationSerializer  # traigo el serializer
+    permission_classes = [IsAdminUser]
+    serializer_class = ReservationSerializer
 
-    def partial_update(self, request, reservation_id=None):
+    def get(self, request, reservation_id=None):
+        """
+        GET opcional solo para Swagger / testing.
+        Devuelve los datos de la reserva.
+        """
         try:
-            reservation = Reservation.objects.get(
-                pk=reservation_id
-            )  # traigo la reserva
-        except Reservation.DoesNotExist:  # y sino no existe
+            reservation = ReservationService.get_by_id(reservation_id)
+        except ValueError:
             return Response(
                 {"error": "La reserva no existe."},
                 status=status.HTTP_404_NOT_FOUND,
             )
 
-        new_status = request.data.get("status")  # agarro el estado
+        serializer = ReservationSerializer(reservation)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
+    def patch(self, request, reservation_id=None):
+        try:
+            reservation = ReservationService.get_by_id(reservation_id)
+        except ValueError:
+            return Response(
+                {"error": "La reserva no existe."},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        new_status = request.data.get("status")
         if not new_status:
             return Response(
                 {"error": "Debe proporcionar un nuevo estado."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        # actualiza el estado
-        reservation.status = new_status.lower()
-        reservation.save()  # lo guarda
+        # Cambiamos el estado usando el service
+        updated_reservation = ReservationService.update(
+            reservation_id=reservation.id,
+            status=new_status.lower(),
+            reservation_date=reservation.reservation_date,
+            price=reservation.price,
+            reservation_code=reservation.reservation_code,
+            flight_id=reservation.flight.id,
+            passenger_id=reservation.passenger.id,
+            seat_id=reservation.seat.id,
+            user_id=reservation.user.id,
+        )
 
-        serializer = ReservationSerializer(reservation)
+        serializer = ReservationSerializer(updated_reservation)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
@@ -338,8 +338,7 @@ class ChangeReservationStatusAPIView(AuthAdminView, viewsets.ViewSet):
 Gestión de Aviones y Asientos (API)
 """
 
-
-# lista de aviones registrados
+#Listar aviones registrados.
 class PlaneViewSet(AuthAdminView, viewsets.ModelViewSet):
     """
     CRUD completo de vuelos (solo para admins)
@@ -360,49 +359,16 @@ class PlaneLayoutAPIView(AuthView, ListAPIView):
     """
     GET /api/planeLayout/<int:plane_id>/
     Devuelve el layout de los asientos del avion
-    Ejemplo de respuesta:
     """
 
-    permission_classes = [IsAuthenticated]  # solo autenticados
-    serializer_class = SeatSerializer  # traigo el serializer
-    pagination_class = None  # no se pagina devuelve todo el layout
+    permission_classes = [IsAuthenticated]
+    serializer_class = SeatSerializer
+    pagination_class = None
 
     def list(self, request, plane_id):
-        try:
-            plane = Plane.objects.get(pk=plane_id)  # traigo el objeto
-        except Plane.DoesNotExist:
-            return Response(  # sino no existe
-                {"error": "El avión no existe."},
-                status=status.HTTP_404_NOT_FOUND,
-            )
-
-        # trae todos los asientos del avion, ordenados por fila y columna
-        seats = Seat.objects.filter(plane=plane).order_by("row", "column")
-
-        # se crea una lista vacia que va a tener una sublista por cada fila del avion
-        layout = []
-        for r in range(
-            1, plane.rows + 1
-        ):  # se itera por los numeros de fila desde 1 hasta plane.rows (es decir los que tengaen total)
-            row_seats = seats.filter(row=r)
-            layout.append(
-                [
-                    {
-                        "number": seat.number,
-                        "seat_type": seat.seat_type,
-                        "status": seat.status,
-                    }
-                    for seat in row_seats
-                ]
-            )
-
-        data = {  # devuelve la estructura JSON al cliente con codigo 200
-            "plane": str(plane),
-            "rows": plane.rows,
-            "columns": plane.columns,
-            "layout": layout,
-        }
-
+        data = PlaneService.get_plane_layout(plane_id)
+        if not data:
+            return Response({"error": "El avión no existe."}, status=status.HTTP_404_NOT_FOUND)
         return Response(data, status=status.HTTP_200_OK)
 
 
@@ -410,32 +376,18 @@ class PlaneLayoutAPIView(AuthView, ListAPIView):
 class SeatAvailabilityAPIView(AuthView, RetrieveAPIView):
     """
     GET /api/checkSeatAvailability/<int:plane_id>/<str:seat_code>/
-    se verifica si un asiento existe y muestra su estado actual
-    solo para usuarios autenticados.
+    Verifica si un asiento existe y muestra su estado actual
+    api/checkSeatAvailability/4/1A/
     """
 
-    permission_classes = [IsAuthenticated]  # solo para usuarios autenticados
-    serializer_class = SeatSerializer  # se trae el serializer
-    queryset = Seat.objects.all()  # traemos todos los objetos de seat
+    permission_classes = [IsAuthenticated]
+    serializer_class = SeatSerializer
 
-    def get(self, request, seat_code, plane_id):
-        try:
-            seat = Seat.objects.get(
-                plane_id=plane_id, number__iexact=seat_code
-            )  # se trae el codigo del asiento
-        except Seat.DoesNotExist:
-            return Response(  # si no exist eerror
-                {"error": "El asiento no existe."},
-                status=status.HTTP_404_NOT_FOUND,
-            )
-
-        data = {  # devuelve la estructura JSON al cliente con codigo 200
-            "seat_code": seat.number,
-            "plane": str(seat.plane),
-            "status": seat.status,
-        }
-
-        return Response(data, status=status.HTTP_200_OK)  # la respuesta
+    def get(self, request, plane_id, seat_code):
+        data = SeatService.check_availability(plane_id, seat_code)
+        if not data:
+            return Response({"error": "El asiento no existe."}, status=status.HTTP_404_NOT_FOUND)
+        return Response(data, status=status.HTTP_200_OK)
 
 
 # ---------------------------------------------------------------------------------------------
@@ -501,38 +453,18 @@ class GenerateTicketAPIView(AuthAdminView, APIView):
 class TicketInformationAPIView(AuthView, RetrieveAPIView):
     """
     GET /api/ticketInformation/<str:barcode>/
-    buscar un ticket por su barcode
-    solo para usuarios autenticados
-    ej: api/ticketInformation/68N3VEGB4PTD
+    Buscar un ticket por su barcode
+    por ejemplo /api/ticketInformation/Y8C5TLQEGZ39
     """
 
-    permission_classes = [IsAuthenticated]  # solo para usuarios autenticados
-    serializer_class = TicketSerializer  # se trae el serializer
-    queryset = Ticket.objects.all()  # traemos todos los objetos de seat
+    permission_classes = [IsAuthenticated]
+    serializer_class = TicketSerializer
 
     def get(self, request, barcode):
-        try:
-            ticket = Ticket.objects.get(
-                barcode__iexact=barcode
-            )  # se trae el codigo del asiento
-        except Ticket.DoesNotExist:
-            return Response(  # si no exist eerror
-                {"error": "El ticket no existe."},
-                status=status.HTTP_404_NOT_FOUND,
-            )
-
-        data = {  # devuelve la estructura JSON al cliente con codigo 200
-            "barcode": ticket.barcode,
-            "status": ticket.status,
-            "reservation": {
-                "id": ticket.reservation.id,
-                "status": ticket.reservation.status,
-                "passenger": str(ticket.reservation.passenger),
-                "flight": str(ticket.reservation.flight),
-            },
-        }
-
-        return Response(data, status=status.HTTP_200_OK)  # la respuesta
+        data = TicketService.get_ticket_info(barcode)
+        if not data:
+            return Response({"error": "El ticket no existe."}, status=status.HTTP_404_NOT_FOUND)
+        return Response(data, status=status.HTTP_200_OK)
 
 
 # ---------------------------------------------------------------------------------------------
@@ -546,56 +478,94 @@ Reportes (API)
 class PassengersByFlightAPIView(AuthView, APIView):
     """
     GET /api/passengersByFlight/<int:flight_id>/
-    lista de pasajeros que tienen reservas confirmadas en un vuelo
-    solo para usuarios autenticados
+    Lista de pasajeros con reservas confirmadas en un vuelo
     """
 
-    permission_classes = [IsAuthenticated]  # solo autenticados
-    serializer_class = PassengerSerializer
+    permission_classes = [IsAuthenticated]
+    serializer_class = ReservationSerializer
 
     def get(self, request, flight_id):
-        try:
-            flight = Flight.objects.get(pk=flight_id)  # agarramos el objeto
-        except Flight.DoesNotExist:  # si no esta pa casa
-            return Response(
-                {"error": "El vuelo no existe."},
-                status=status.HTTP_404_NOT_FOUND,
-            )
-
-        # filtra las reservas confirmadas de ese vuelo
-        reservations = Reservation.objects.filter(flight=flight, status="confirmed")
-
-        # obtiene los pasajeros unicos de esas reservas
-        passengers = [res.passenger for res in reservations]
+        passengers = ReservationService.get_passengers_by_flight(flight_id)
+        if passengers is None:
+            return Response({"error": "El vuelo no existe."}, status=status.HTTP_404_NOT_FOUND)
 
         serializer = PassengerSerializer(passengers, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)  # respuesta
-
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 # Endpoint para obtener reservas activas de un pasajero.
 class ActiveReservationsByPassengerAPIView(AuthView, APIView):
     """
     GET /api/activeReservations/<int:passenger_id>/
-    devuelve todas las reservas activas (confirmed) de un pasajero
-    solo para usuarios autenticados
+    Devuelve todas las reservas activas (confirmed) de un pasajero
     """
 
-    permission_classes = [IsAuthenticated]  # solo autenticados
-    serializer_class = ReservationSerializer
+    permission_classes = [IsAuthenticated]
+    serializer_class = PassengerSerializer
 
     def get(self, request, passenger_id):
-        try:
-            passenger = Passenger.objects.get(pk=passenger_id)  # traigo el obj
-        except Passenger.DoesNotExist:
-            return Response(  # sino error
-                {"error": "El pasajero no existe."},
-                status=status.HTTP_404_NOT_FOUND,
-            )
-
-        # filtra las reservas activas del pasajero
-        active_reservations = Reservation.objects.filter(
-            passenger=passenger, status="confirmed"
-        )
+        active_reservations = PassengerService.get_active_reservations(passenger_id)
+        if active_reservations is None:
+            return Response({"error": "El pasajero no existe."}, status=status.HTTP_404_NOT_FOUND)
 
         serializer = ReservationSerializer(active_reservations, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)  # resultado
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+"""
+CRUDS
+"""
+
+class UserViewSet(AuthAdminView, viewsets.ModelViewSet):
+    """
+    CRUD completo de users (solo para admins)
+    - GET /api/user-vs/
+    - POST /api/user-vs/
+    - GET /api/user-vs/{id}/
+    - PUT /api/user-vs/{id}/
+    - PATCH /api/user-vs/{id}/
+    - DELETE /api/user-vs/{id}/
+    """
+
+    queryset = User.objects.all().order_by("id")
+    serializer_class = UserSerializer
+
+class FlightStatusViewSet(AuthAdminView, viewsets.ModelViewSet):
+    """
+    CRUD completo de flightStatus (solo para admins)
+    - GET /api/flightStatus-vs/
+    - POST /api/flightStatus-vs/
+    - GET /api/flightStatus-vs/{id}/
+    - PUT /api/flightStatus-vs/{id}/
+    - PATCH /api/flightStatus-vs/{id}/
+    - DELETE /api/flightStatus-vs/{id}/
+    """
+
+    queryset = FlightStatus.objects.all().order_by("id")
+    serializer_class = FlightStatusSerializer
+
+class ReservationViewSet(AuthAdminView, viewsets.ModelViewSet):
+    """
+    CRUD completo de reservation (solo para admins)
+    - GET /api/reservation-vs/
+    - POST /api/reservation-vs/
+    - GET /api/reservation-vs/{id}/
+    - PUT /api/reservation-vs/{id}/
+    - PATCH /api/reservation-vs/{id}/
+    - DELETE /api/reservation-vs/{id}/
+    """
+
+    queryset = Reservation.objects.all().order_by("id")
+    serializer_class = ReservationSerializer
+
+class TicketViewSet(AuthAdminView, viewsets.ModelViewSet):
+    """
+    CRUD completo de ticket (solo para admins)
+    - GET /api/ticket-vs/
+    - POST /api/ticket-vs/
+    - GET /api/ticket-vs/{id}/
+    - PUT /api/ticket-vs/{id}/
+    - PATCH /api/ticket-vs/{id}/
+    - DELETE /api/ticket-vs/{id}/
+    """
+
+    queryset = Ticket.objects.all().order_by("id")
+    serializer_class = TicketSerializer

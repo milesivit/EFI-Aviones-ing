@@ -1,0 +1,126 @@
+[
+    {
+      "model": "airline.user",
+      "pk": 1,
+      "fields": {
+        "username": "admin",
+        "email": "admin@test.com",
+        "role": "admin",
+        "is_active": true,
+        "is_staff": true,
+        "is_superuser": true,
+        "password": "pbkdf2_sha256$1000000$SSwdHEUaDaLSQEI4kaPM3Q$JNf3uZD27UaG0OvM+4DMAwJkJ9rA8SuIXZo3p8Ok43M="
+      }
+    },
+    {
+      "model": "airline.user",
+      "pk": 2,
+      "fields": {
+        "username": "user1",
+        "email": "user1@test.com",
+        "role": "user",
+        "is_active": true,
+        "is_staff": false,
+        "is_superuser": false,
+        "password": "pbkdf2_sha256$1000000$AESM9pJlSBOiRrcUpJrdJR$iDWzfrF3w26PLPUor2RB1QW8EgNsUSQaKvLK0pp+A2U="
+      }
+    },
+    {
+      "model": "airline.plane",
+      "pk": 1,
+      "fields": {
+        "model": "Boeing 737",
+        "capacity": 180,
+        "rows": 30,
+        "columns": 6
+      }
+    },
+    {
+      "model": "airline.plane",
+      "pk": 2,
+      "fields": {
+        "model": "Airbus A320",
+        "capacity": 160,
+        "rows": 27,
+        "columns": 6
+      }
+    },
+    {
+      "model": "airline.flightstatus",
+      "pk": 1,
+      "fields": {
+        "status": "Scheduled"
+      }
+    },
+    {
+      "model": "airline.flightstatus",
+      "pk": 2,
+      "fields": {
+        "status": "Delayed"
+      }
+    },
+    {
+      "model": "airline.flight",
+      "pk": 1,
+      "fields": {
+        "origin": "Buenos Aires",
+        "destination": "New York",
+        "departure_date": "2025-12-01T10:00:00Z",
+        "arrival_date": "2025-12-01T14:00:00Z",
+        "duration": "04:00:00",
+        "base_price": "1200.00",
+        "status": 1,
+        "plane": 1,
+        "user": [1,2]
+      }
+    },
+    {
+      "model": "airline.passenger",
+      "pk": 1,
+      "fields": {
+        "name": "John Doe",
+        "document": "12345678",
+        "document_type": "dni",
+        "email": "john@example.com",
+        "phone": "123456789",
+        "birth_date": "1990-01-01"
+      }
+    },
+    {
+      "model": "airline.seat",
+      "pk": 1,
+      "fields": {
+        "number": "1A",
+        "row": 1,
+        "column": "A",
+        "seat_type": "business",
+        "status": "available",
+        "plane": 1
+      }
+    },
+    {
+      "model": "airline.reservation",
+      "pk": 1,
+      "fields": {
+        "status": "confirmed",
+        "reservation_date": "2025-11-01T12:00:00Z",
+        "price": "1200.00",
+        "reservation_code": "RES001",
+        "flight": 1,
+        "passenger": 1,
+        "seat": 1,
+        "user": 2
+      }
+    },
+    {
+      "model": "airline.ticket",
+      "pk": 1,
+      "fields": {
+        "barcode": "TICKET001",
+        "issue_date": "2025-11-01T12:05:00Z",
+        "status": "active",
+        "reservation": 1
+      }
+    }
+  ]
+  

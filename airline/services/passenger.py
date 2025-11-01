@@ -67,3 +67,11 @@ class PassengerService:
         if name:
             return PassengerRepository.search_by_name(name=name)
         return ValueError("El Pasajero No Existe")
+
+    @staticmethod
+    def get_active_reservations(passenger_id: int):
+        passenger = PassengerRepository.get_passenger_by_id(passenger_id)
+        if not passenger:
+            return None  
+
+        return PassengerRepository.get_active_reservations(passenger)

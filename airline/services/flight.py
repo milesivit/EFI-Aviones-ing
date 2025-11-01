@@ -87,3 +87,11 @@ class FlightService:
             flight for flight in all_flights if flight.departure_date.date() >= today
         ]
         return upcoming_flights
+    
+    @staticmethod
+    def filter_flights(origin=None, destination=None, date=None):
+        """
+        Lógica de negocio para filtrar vuelos.
+        Aquí podrías agregar validaciones, logs, etc.
+        """
+        return FlightRepository.filter_flights(origin, destination, date)
