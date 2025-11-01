@@ -68,5 +68,31 @@ class SeatService:
         return ValueError("El Asiento No Existe")
     
     @staticmethod
-    def mark_as_taken(seat_id: int) -> Seat:
+    def mark_as_taken(seat_id: int) -> list[Seat]:
         return SeatRepository.mark_as_taken(seat_id)
+    
+    @staticmethod
+    def verify_seat(seat_id: int, plane: int, status: str) -> list[Seat]:
+        return SeatRepository.verify_seat(seat_id, plane, status)
+    
+    @staticmethod
+    def create_bulk_for_plane(rows, columns, seat_type, plane):
+        """
+        Crea los asientos de un avión en masa.
+        """
+        seats = []
+        for row in rows:
+            for col in columns:
+                seats.append(
+                    Seat(
+                        number=f"{row}{col}",
+                        row=row,
+                        column=col,
+                        seat_type=seat_type,
+                        status="available",
+                        plane=plane,
+                    )
+                )
+
+        SeatRepository.bulk_create(seats)
+        return seats 

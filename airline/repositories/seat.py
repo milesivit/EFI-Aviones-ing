@@ -89,3 +89,15 @@ class SeatRepository:
         seat.status = "taken"
         seat.save()
         return seat
+    
+    @staticmethod
+    def verify_seat(seat_id: int, plane: int, status: str) -> list[Seat]:
+        seat = SeatRepository.get_by_id(seat_id=seat_id)
+        return Seat.objects.filter(seat_id=seat, plane=plane, status="available")
+    
+    @staticmethod
+    def bulk_create(seats) -> list[Seat]:
+        """
+        Crea múltiples asientos en la base de datos de manera eficiente.
+        """
+        Seat.objects.bulk_create(seats)

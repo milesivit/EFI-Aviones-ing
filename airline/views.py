@@ -7,11 +7,8 @@ import string
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, update_session_auth_hash
 from django.http import HttpResponse
-from django.shortcuts import get_object_or_404, redirect, render
-
-# Modelos internos de la aplicación
-from airline.models import Flight, Plane, Reservation, Seat #TODO ARREGLAR ESTO Q NO LE PEGUE AL MODELO
-
+from django.shortcuts import redirect, render
+         
 # Formularios internos
 from airline.forms import (
     CreateFlightForm,
@@ -167,7 +164,7 @@ def add_status_flight(request):
 # passengers
 def add_passenger(request, flight_id):
     # Obtiene el vuelo correspondiente al ID proporcionado, o devuelve un 404 si no existe
-    flight = get_object_or_404(Flight, id=flight_id)
+    flight = FlightService.get_by_id(id=flight_id)
 
     if request.method == "POST":
         # Si el formulario fue enviado, crea una instancia de PassengerForm con los datos enviados
@@ -182,7 +179,7 @@ def add_passenger(request, flight_id):
             document_clean = cd["document"].strip()  # Documento limpio (sin espacios)
 
             # Verifica si ya existe un pasajero con el mismo documento en este vuelo
-            existing = Reservation.objects.filter(
+            existing = ReservationService.get_by_flight_and_passenger_document(
                 flight_id=flight, passenger__document=document_clean
             ).first()
 
@@ -220,12 +217,12 @@ def add_passenger(request, flight_id):
 # seat
 def select_seat(request, flight_id, passenger_id):
     # Obtiene el vuelo correspondiente al ID, o lanza 404 si no existe
-    flight = get_object_or_404(Flight, id=flight_id)
+    flight = FlightService.get_by_id(id=flight_id)
     # Obtiene el avión asociado al vuelo
     plane = flight.plane
 
     # Obtiene todos los asientos del avión, ordenados por fila y columna
-    seats = Seat.objects.filter(plane=plane).order_by("row", "column")
+    seats = SeatService.get_by_id(plane=plane).order_by("row", "column")
 
     # Número máximo de filas y columnas del avión
     max_row = plane.rows
@@ -253,11 +250,10 @@ def select_seat(request, flight_id, passenger_id):
     if request.method == "POST":
         seat_id = request.POST.get("seat_id")  # Obtiene el ID del asiento seleccionado
         # Verifica que el asiento exista, esté en el avión correcto y esté disponible
-        seat = get_object_or_404(Seat, id=seat_id, plane=plane, status="available")
+        seat = SeatService.verify_seat(seat_id=seat_id, plane=plane, status="available")
 
         # Marca el asiento como ocupado
-        seat.status = "Taken"
-        seat.save()
+        SeatService.mark_as_taken()
 
         # Redirige a la confirmación de la reserva, pasando vuelo, pasajero y asiento
         return redirect(
@@ -304,20 +300,10 @@ def create_seats_for_plane(plane):
             seat_type = "economico"
 
         # Para cada columna de la fila, crea un asiento
-        for col in columns:
-            seats.append(
-                Seat(
-                    number=f"{row}{col}",  # Número de asiento como "1A", "1B", etc.
-                    row=row,
-                    column=col,
-                    seat_type=seat_type,
-                    status="available",  # todos los asientos comienzan como disponibles
-                    plane=plane,  # Se asigna al avión correspondiente
-                )
-            )
+        SeatService.create_bulk_for_plane(row, columns, seat_type, plane)
 
     # Crea todos los asientos en la base de datos de forma masiva (bulk_create)
-    Seat.objects.bulk_create(seats)
+    SeatService.bulk_create(seats)
 
 
 def plane_list(request):
@@ -342,13 +328,12 @@ def plane_list(request):
             if form.is_valid():
                 cd = form.cleaned_data
                 # Crea un nuevo avión
-                new_plane = Plane(
+                new_plane = PlaneService.create(
                     model=cd["model"],
                     capacity=cd["capacity"],
                     rows=cd["rows"],
                     columns=cd["columns"],
                 )
-                new_plane.save()
                 # Crea automáticamente los asientos del avión
                 create_seats_for_plane(new_plane)
                 return redirect("plane_list")  # Redirige a la lista de aviones
@@ -358,18 +343,20 @@ def plane_list(request):
         # ACTUALIZAR AVIÓN
         elif action == "update":
             update_plane_id = request.POST.get("plane_id")
-            plane_to_update = get_object_or_404(Plane, id=update_plane_id)
+            plane_to_update = PlaneService.get_by_id(id=update_plane_id)
             update_form_with_errors = UpdatePlaneForm(
                 request.POST, plane_id=plane_to_update.id
             )
             if update_form_with_errors.is_valid():
                 # Guardar cambios manualmente (es un forms.Form, no ModelForm)
                 cd = update_form_with_errors.cleaned_data
-                plane_to_update.model = cd["model"]
-                plane_to_update.capacity = cd["capacity"]
-                plane_to_update.rows = cd["rows"]
-                plane_to_update.columns = cd["columns"]
-                plane_to_update.save()
+                PlaneService.update(
+                    plane_id=plane_to_update,
+                    model = cd["model"],
+                    capacity = cd["capacity"],
+                    rows = cd["rows"],
+                    columns = cd["columns"]
+                )
                 return redirect("plane_list")
             else:
                 update_errors = True  # Marca que hubo errores en la actualización
@@ -427,7 +414,7 @@ def plane_list(request):
 
 def plane_detail(request, plane_id):
     # Obtiene el avión correspondiente al ID proporcionado o lanza 404 si no existe
-    plane = get_object_or_404(Plane, pk=plane_id)
+    plane = PlaneService.get_by_id(pk=plane_id)
 
     # Número de filas y columnas del avión
     rows = plane.rows
@@ -522,7 +509,7 @@ def edit_user(request, user_id):
         # Actualiza el usuario usando el servicio UserService
         # Se mantiene el rol actual del usuario
         UserService.update(
-            user_id=user_id,
+            user_id=user,
             username=username,
             password=password,
             email=email,
@@ -531,7 +518,7 @@ def edit_user(request, user_id):
 
         # Refrescar la sesión para mantener la autenticación si el usuario se está editando a sí mismo
         # Se obtiene nuevamente el usuario actualizado
-        updated_user = UserService.get_by_id(user_id)
+        updated_user = UserService.get_by_id(user)
         update_session_auth_hash(
             request, updated_user
         )  # IMPORTANTE para no cerrar sesión
@@ -646,7 +633,7 @@ def flight_administration(request):
             if form.is_valid():
                 cd = form.cleaned_data
                 # Crea un nuevo vuelo
-                new_flight = Flight(
+                FlightService.create(
                     origin=cd["origin"],
                     destination=cd["destination"],
                     departure_date=cd["departure_date"],
@@ -656,7 +643,6 @@ def flight_administration(request):
                     status=cd["status_id"],
                     plane=cd["plane_id"],
                 )
-                new_flight.save()
                 return redirect("flight_administration")  # Redirige a la misma vista
             else:
                 form_errors = True  # Marca que hubo errores al crear
@@ -664,22 +650,24 @@ def flight_administration(request):
         # ACTUALIZAR VUELO
         elif action == "update":
             update_flight_id = request.POST.get("flight_id")
-            flight_to_update = get_object_or_404(Flight, id=update_flight_id)
+            flight_to_update = FlightService.get_by_id(id=update_flight_id)
             update_form_with_errors = UpdateFlightForm(
                 request.POST, flight_id=update_flight_id
             )
             if update_form_with_errors.is_valid():
                 cd = update_form_with_errors.cleaned_data
                 # Actualiza los campos del vuelo
-                flight_to_update.origin = cd["origin"]
-                flight_to_update.destination = cd["destination"]
-                flight_to_update.departure_date = cd["departure_date"]
-                flight_to_update.arrival_date = cd["arrival_date"]
-                flight_to_update.duration = cd["arrival_date"] - cd["departure_date"]
-                flight_to_update.base_price = cd["base_price"]
-                flight_to_update.status_id = cd["status_id"]
-                flight_to_update.plane_id = cd["plane_id"]
-                flight_to_update.save()
+                FlightService.update(
+                    flight=flight_to_update,
+                    origin = cd["origin"],
+                    destination = cd["destination"],
+                    departure_date = cd["departure_date"],
+                    arrival_date = cd["arrival_date"],
+                    duration = cd["arrival_date"] - cd["departure_date"],
+                    base_price = cd["base_price"],
+                    status_id = cd["status_id"],
+                    plane_id = cd["plane_id"],
+                )
                 return redirect("flight_administration")
             else:
                 update_errors = True  # Marca que hubo errores en la actualización

@@ -86,3 +86,8 @@ class ReservationService:
     @staticmethod
     def get_by_flight(flight_id: int) -> list[Reservation]:
         return ReservationRepository.get_by_flight(flight_id=flight_id)
+
+    @staticmethod
+    def get_by_flight_and_passenger_document(flight_id, document):
+        reservation = ReservationRepository.get_by_flight_and_passenger_document(flight_id, document)
+        return reservation is not None

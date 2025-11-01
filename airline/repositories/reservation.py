@@ -1,5 +1,5 @@
 from datetime import datetime
-from airline.models import Reservation
+from airline.models import Reservation, Plane, Passenger
 
 
 class ReservationRepository:
@@ -137,3 +137,13 @@ class ReservationRepository:
     @staticmethod
     def get_by_flight(flight_id: int) -> list[Reservation]:
         return Reservation.objects.filter(flight_id=flight_id)
+    
+    @staticmethod
+    def get_by_flight_and_passenger_document(flight_id, document) -> list[Reservation]:
+        """
+        Devuelve una reserva si existe un pasajero con ese documento en el vuelo dado.
+        """
+        return Reservation.objects.filter(
+            flight_id=flight_id,
+            passenger__document=document
+        ).first()
