@@ -78,6 +78,7 @@ class RegisterForm(forms.Form):
             role=role,
         )
 
+
 # Formulario para iniciar sesión de usuarios en el sistema
 class LoginForm(forms.Form):
 
@@ -90,8 +91,7 @@ class LoginForm(forms.Form):
 
     # Campo de contraseña (oculta el texto ingresado)
     password = forms.CharField(
-        label="Password",
-        widget=forms.PasswordInput(attrs={"class": "form-control"})
+        label="Password", widget=forms.PasswordInput(attrs={"class": "form-control"})
     )
 
     # Validación general del formulario

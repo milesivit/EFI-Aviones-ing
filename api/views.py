@@ -6,7 +6,7 @@ from airline.models import (
     Seat,
     Reservation,
     Ticket,
-    FlightStatus
+    FlightStatus,
 )
 
 from api.serializers import (
@@ -17,7 +17,7 @@ from api.serializers import (
     ReservationSerializer,
     TicketSerializer,
     UserSerializer,
-    FlightStatusSerializer
+    FlightStatusSerializer,
 )
 
 from rest_framework import viewsets
@@ -47,6 +47,7 @@ from airline.services.ticket import TicketService
 Gestión de Vuelos (API)
 """
 
+
 # Listar todos los vuelos disponibles.
 class FlightAvailableListAPIView(AuthView, ListAPIView):
     """
@@ -59,7 +60,7 @@ class FlightAvailableListAPIView(AuthView, ListAPIView):
 
     def get_queryset(self):
         return FlightService.get_upcoming_flights()
-    
+
 
 # Obtener detalle de un vuelo.
 class FlightDetailAPIView(AuthView, RetrieveAPIView):
@@ -78,11 +79,12 @@ class FlightDetailAPIView(AuthView, RetrieveAPIView):
             return FlightService.get_by_id(flight_id)
         except Flight.DoesNotExist:
             from rest_framework.exceptions import NotFound
+
             raise NotFound(detail="Flight not found")
 
 
 # filtrar vuelos por origen, destino y fecha.
-class FlightFilterAPIView(AuthView, ListAPIView): #TODO se ve mal en swagger
+class FlightFilterAPIView(AuthView, ListAPIView):  # TODO se ve mal en swagger
     """
     GET /api/flightFilter/?origin=<ciudad>&destination=<ciudad>&date=<YYYY-MM-DD>
     ejemplo de url= /api/flightFilter/?origin=Tokio&destination=Nagoya
@@ -102,7 +104,7 @@ class FlightFilterAPIView(AuthView, ListAPIView): #TODO se ve mal en swagger
         return FlightService.filter_flights(origin, destination, date)
 
 
-#crear, editar y eliminar vuelos (solo administradores).
+# crear, editar y eliminar vuelos (solo administradores).
 class FlightViewSet(AuthAdminView, viewsets.ModelViewSet):
     """
     CRUD completo de vuelos (solo para admins)
@@ -124,7 +126,8 @@ class FlightViewSet(AuthAdminView, viewsets.ModelViewSet):
 Gestión de Pasajeros (API)
 """
 
-#registrar un pasajero. solo para admin papá
+
+# registrar un pasajero. solo para admin papá
 class PassengerViewSet(AuthAdminView, viewsets.ModelViewSet):
     """
     CRUD completo de pasajero (solo para admins)
@@ -155,7 +158,8 @@ class PassengerDetailAPIView(AuthView, RetrieveAPIView):
         passenger_id = self.kwargs.get("pk")
         return PassengerService.get_by_id(passenger_id)
 
-#listas reservas asociadas a un pasajero
+
+# listas reservas asociadas a un pasajero
 class ReservationByPassengerAPIView(AuthView, ListAPIView):
     """
     GET /api/reservationsByPassenger/<int:passenger_id>/
@@ -338,7 +342,8 @@ class ChangeReservationStatusAPIView(AuthAdminView, APIView):
 Gestión de Aviones y Asientos (API)
 """
 
-#Listar aviones registrados.
+
+# Listar aviones registrados.
 class PlaneViewSet(AuthAdminView, viewsets.ModelViewSet):
     """
     CRUD completo de vuelos (solo para admins)
@@ -368,7 +373,9 @@ class PlaneLayoutAPIView(AuthView, ListAPIView):
     def list(self, request, plane_id):
         data = PlaneService.get_plane_layout(plane_id)
         if not data:
-            return Response({"error": "El avión no existe."}, status=status.HTTP_404_NOT_FOUND)
+            return Response(
+                {"error": "El avión no existe."}, status=status.HTTP_404_NOT_FOUND
+            )
         return Response(data, status=status.HTTP_200_OK)
 
 
@@ -386,7 +393,9 @@ class SeatAvailabilityAPIView(AuthView, RetrieveAPIView):
     def get(self, request, plane_id, seat_code):
         data = SeatService.check_availability(plane_id, seat_code)
         if not data:
-            return Response({"error": "El asiento no existe."}, status=status.HTTP_404_NOT_FOUND)
+            return Response(
+                {"error": "El asiento no existe."}, status=status.HTTP_404_NOT_FOUND
+            )
         return Response(data, status=status.HTTP_200_OK)
 
 
@@ -463,7 +472,9 @@ class TicketInformationAPIView(AuthView, RetrieveAPIView):
     def get(self, request, barcode):
         data = TicketService.get_ticket_info(barcode)
         if not data:
-            return Response({"error": "El ticket no existe."}, status=status.HTTP_404_NOT_FOUND)
+            return Response(
+                {"error": "El ticket no existe."}, status=status.HTTP_404_NOT_FOUND
+            )
         return Response(data, status=status.HTTP_200_OK)
 
 
@@ -487,10 +498,13 @@ class PassengersByFlightAPIView(AuthView, APIView):
     def get(self, request, flight_id):
         passengers = ReservationService.get_passengers_by_flight(flight_id)
         if passengers is None:
-            return Response({"error": "El vuelo no existe."}, status=status.HTTP_404_NOT_FOUND)
+            return Response(
+                {"error": "El vuelo no existe."}, status=status.HTTP_404_NOT_FOUND
+            )
 
         serializer = PassengerSerializer(passengers, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
 
 # Endpoint para obtener reservas activas de un pasajero.
 class ActiveReservationsByPassengerAPIView(AuthView, APIView):
@@ -505,14 +519,18 @@ class ActiveReservationsByPassengerAPIView(AuthView, APIView):
     def get(self, request, passenger_id):
         active_reservations = PassengerService.get_active_reservations(passenger_id)
         if active_reservations is None:
-            return Response({"error": "El pasajero no existe."}, status=status.HTTP_404_NOT_FOUND)
+            return Response(
+                {"error": "El pasajero no existe."}, status=status.HTTP_404_NOT_FOUND
+            )
 
         serializer = ReservationSerializer(active_reservations, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+
 """
 CRUDS
 """
+
 
 class UserViewSet(AuthAdminView, viewsets.ModelViewSet):
     """
@@ -528,6 +546,7 @@ class UserViewSet(AuthAdminView, viewsets.ModelViewSet):
     queryset = User.objects.all().order_by("id")
     serializer_class = UserSerializer
 
+
 class FlightStatusViewSet(AuthAdminView, viewsets.ModelViewSet):
     """
     CRUD completo de flightStatus (solo para admins)
@@ -542,6 +561,7 @@ class FlightStatusViewSet(AuthAdminView, viewsets.ModelViewSet):
     queryset = FlightStatus.objects.all().order_by("id")
     serializer_class = FlightStatusSerializer
 
+
 class ReservationViewSet(AuthAdminView, viewsets.ModelViewSet):
     """
     CRUD completo de reservation (solo para admins)
@@ -555,6 +575,7 @@ class ReservationViewSet(AuthAdminView, viewsets.ModelViewSet):
 
     queryset = Reservation.objects.all().order_by("id")
     serializer_class = ReservationSerializer
+
 
 class TicketViewSet(AuthAdminView, viewsets.ModelViewSet):
     """

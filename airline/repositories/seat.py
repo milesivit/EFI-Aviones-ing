@@ -76,7 +76,7 @@ class SeatRepository:
     @staticmethod
     def search_by_number(number: str) -> list[Seat]:
         return Seat.objects.filter(number__icontains=number)
-    
+
     @staticmethod
     def mark_as_taken(seat_id: int) -> Seat:
         seat = SeatRepository.get_by_id(seat_id)
@@ -89,14 +89,13 @@ class SeatRepository:
         seat.status = "taken"
         seat.save()
         return seat
-    
+
     @staticmethod
     def get_available_by_plane(plane_id: int) -> list[Seat]:
         return Seat.objects.filter(
-            plane_id=plane_id,
-            status__in=["available", "disponible"]
+            plane_id=plane_id, status__in=["available", "disponible"]
         ).order_by("id")
-    
+
     @staticmethod
     def get_seat_by_plane_and_code(plane_id: int, seat_code: str) -> Seat | None:
         try:

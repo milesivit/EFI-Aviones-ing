@@ -7,12 +7,15 @@ from django.forms.widgets import DateTimeInput
 from airline.models import Flight, FlightStatus, Passenger, Plane, Reservation
 from airline.services.flight import FlightService
 
+
 class PassengerForm(forms.Form):
     # Campo para el nombre del pasajero
     name = forms.CharField(
         label="Name",
         max_length=255,
-        widget=forms.TextInput(attrs={"class": "form-control"}),  # Se aplica clase de Bootstrap
+        widget=forms.TextInput(
+            attrs={"class": "form-control"}
+        ),  # Se aplica clase de Bootstrap
     )
 
     # Campo para el documento de identidad
@@ -31,8 +34,7 @@ class PassengerForm(forms.Form):
 
     # Campo de correo electrónico
     email = forms.EmailField(
-        label="Email", 
-        widget=forms.EmailInput(attrs={"class": "form-control"})
+        label="Email", widget=forms.EmailInput(attrs={"class": "form-control"})
     )
 
     # Número de teléfono
@@ -45,7 +47,9 @@ class PassengerForm(forms.Form):
     # Fecha de nacimiento
     birth_date = forms.DateField(
         label="Birth Date",
-        widget=forms.DateInput(attrs={"class": "form-control", "type": "date"}),  # Input tipo fecha
+        widget=forms.DateInput(
+            attrs={"class": "form-control", "type": "date"}
+        ),  # Input tipo fecha
     )
 
     # Validación personalizada para la fecha de nacimiento
@@ -61,6 +65,7 @@ class PassengerForm(forms.Form):
         super().__init__(*args, **kwargs)
         # Guardamos el vuelo asociado para posibles validaciones adicionales
         self.flight_id = flight_id
+
 
 class CreateFlightForm(forms.Form):
     # Campo para el aeropuerto o ciudad de origen
@@ -175,21 +180,22 @@ class CreateFlightForm(forms.Form):
             plane_id=plane.id,
         )
 
-class UpdateFlightForm(forms.Form): 
+
+class UpdateFlightForm(forms.Form):
     # Campo de texto para el origen del vuelo.
     origin = forms.CharField(
         max_length=150,
         label="Origen",
         widget=forms.TextInput(attrs={"class": "form-control"}),
     )
-    
+
     # Campo de texto para el destino del vuelo.
     destination = forms.CharField(
         max_length=150,
         label="Destino",
         widget=forms.TextInput(attrs={"class": "form-control"}),
     )
-    
+
     # Fecha y hora de salida del vuelo. Formateada para input de tipo datetime-local.
     departure_date = forms.DateTimeField(
         label="Fecha y hora de salida",
@@ -199,7 +205,7 @@ class UpdateFlightForm(forms.Form):
         ),
         input_formats=["%Y-%m-%dT%H:%M"],
     )
-    
+
     # Fecha y hora de llegada del vuelo.
     arrival_date = forms.DateTimeField(
         label="Fecha y hora de llegada",
@@ -209,14 +215,14 @@ class UpdateFlightForm(forms.Form):
         ),
         input_formats=["%Y-%m-%dT%H:%M"],
     )
-    
+
     # Selección de estado del vuelo desde la tabla FlightStatus.
     status_id = forms.ModelChoiceField(
         queryset=FlightStatus.objects.all(),
         label="Estado del Vuelo",
         widget=forms.Select(attrs={"class": "form-control"}),
     )
-    
+
     # Precio base del boleto. Debe ser un número decimal positivo.
     base_price = forms.DecimalField(
         max_digits=10,
@@ -224,7 +230,7 @@ class UpdateFlightForm(forms.Form):
         label="Precio base del boleto",
         widget=forms.NumberInput(attrs={"class": "form-control", "step": "0.01"}),
     )
-    
+
     # Selección de avión a asignar al vuelo desde la tabla Plane.
     plane_id = forms.ModelChoiceField(
         queryset=Plane.objects.all(),
@@ -282,9 +288,13 @@ class UpdateFlightForm(forms.Form):
         destination = self.cleaned_data["destination"]
         departure_date = self.cleaned_data["departure_date"]
         arrival_date = self.cleaned_data["arrival_date"]
-        duration = self.cleaned_data["duration"]  # Nota: 'duration' no está definido en el formulario
+        duration = self.cleaned_data[
+            "duration"
+        ]  # Nota: 'duration' no está definido en el formulario
         status = self.cleaned_data["status_id"]
-        base_price = (self.cleaned_data["base_price"],)  # Nota: se crea como tupla innecesaria
+        base_price = (
+            self.cleaned_data["base_price"],
+        )  # Nota: se crea como tupla innecesaria
         plane = self.cleaned_data["plane_id"]
 
         return FlightService.update(
@@ -298,29 +308,30 @@ class UpdateFlightForm(forms.Form):
             plane_id=plane.id,
         )
 
+
 class CreatePlaneForm(forms.Form):
-    
+
     # Campo de texto para el modelo del avión.
     model = forms.CharField(
         max_length=150,
         label="Modelo",
         widget=forms.TextInput(attrs={"class": "form-control"}),
     )
-    
+
     # Campo numérico para la capacidad total del avión.
     capacity = forms.IntegerField(
         max_value=9999999,
         label="Capacidad total del avion",
         widget=forms.NumberInput(attrs={"class": "form-control"}),
     )
-    
+
     # Campo numérico para el número total de filas del avión.
     rows = forms.IntegerField(
         max_value=9999999,
         label="Filas totales del avion",
         widget=forms.NumberInput(attrs={"class": "form-control"}),
     )
-    
+
     # Campo numérico para el número total de columnas del avión.
     columns = forms.IntegerField(
         max_value=9999999,
@@ -347,6 +358,7 @@ class CreatePlaneForm(forms.Form):
 
         return cleaned_data
 
+
 class UpdatePlaneForm(forms.Form):
     # Campo de texto para el modelo del avión.
     model = forms.CharField(
@@ -354,21 +366,21 @@ class UpdatePlaneForm(forms.Form):
         label="Modelo",
         widget=forms.TextInput(attrs={"class": "form-control"}),
     )
-    
+
     # Campo numérico para la capacidad total del avión.
     capacity = forms.IntegerField(
         max_value=9999999,
         label="Capacidad total del avión",
         widget=forms.NumberInput(attrs={"class": "form-control"}),
     )
-    
+
     # Campo numérico para el número total de filas del avión.
     rows = forms.IntegerField(
         max_value=9999999,
         label="Filas totales del avión",
         widget=forms.NumberInput(attrs={"class": "form-control"}),
     )
-    
+
     # Campo numérico para el número total de columnas del avión.
     columns = forms.IntegerField(
         max_value=9999999,
@@ -400,4 +412,3 @@ class UpdatePlaneForm(forms.Form):
             raise ValidationError("Los valores ingresados no pueden ser 0 o menos.")
 
         return cleaned_data
-

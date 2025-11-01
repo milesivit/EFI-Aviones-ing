@@ -131,7 +131,7 @@ class PassengerRepository:
             Lista de pasajeros cuyo nombre contenga el texto buscado.
         """
         return Passenger.objects.filter(name__icontains=name)
-    
+
     @staticmethod
     def get_passenger_by_id(passenger_id: int) -> Passenger | None:
         try:

@@ -103,10 +103,9 @@ class UserRepository:
         """
         return User.objects.filter(username__icontains=username)
 
-
     @staticmethod
     def update_staff_status(user: User, is_staff: bool) -> User:
         """Actualiza solo el campo is_staff y lo guarda en la DB."""
         user.is_staff = is_staff
-        user.save() # <--- El .save() SÓLO va aquí
+        user.save()  # <--- El .save() SÓLO va aquí
         return user

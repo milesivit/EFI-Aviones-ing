@@ -14,7 +14,7 @@ class FlightRepository:
         departure_date: datetime,
         arrival_date: datetime,
         duration: timedelta,
-        status: int,          # ahora recibe ID
+        status: int,  # ahora recibe ID
         base_price: float,
         plane_id: int,
         user_id: list[int],
@@ -29,7 +29,7 @@ class FlightRepository:
             arrival_date=arrival_date,
             duration=duration,
             base_price=base_price,
-            status_id=status,   # ⚠️ usar _id
+            status_id=status,  # ⚠️ usar _id
             plane_id=plane_id,  # ⚠️ usar ID directamente
         )
 
@@ -47,7 +47,7 @@ class FlightRepository:
         departure_date: datetime,
         arrival_date: datetime,
         duration: timedelta,
-        status: int,           # recibe ID
+        status: int,  # recibe ID
         base_price: float,
         plane_id: int,
         user_id: list[int],
@@ -61,8 +61,8 @@ class FlightRepository:
         flight.arrival_date = arrival_date
         flight.duration = duration
         flight.base_price = base_price
-        flight.status_id = status     # ⚠️ usar _id
-        flight.plane_id = plane_id    # ⚠️ pasar solo ID
+        flight.status_id = status  # ⚠️ usar _id
+        flight.plane_id = plane_id  # ⚠️ pasar solo ID
 
         # Actualizar ManyToMany
         users = User.objects.filter(id__in=user_id)

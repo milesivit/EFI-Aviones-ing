@@ -137,19 +137,20 @@ class ReservationRepository:
     @staticmethod
     def get_by_flight(flight_id: int) -> list[Reservation]:
         return Reservation.objects.filter(flight_id=flight_id)
-    
+
     @staticmethod
     def get_by_passenger(passenger_id: int):
         """
         Devuelve todas las reservas asociadas a un pasajero.
         """
-        return Reservation.objects.filter(
-            passenger_id=passenger_id
-        ).order_by("-reservation_date")
-    
+        return Reservation.objects.filter(passenger_id=passenger_id).order_by(
+            "-reservation_date"
+        )
+
     @staticmethod
     def get_flight_by_id(flight_id: int) -> Flight | None:
         from airline.models import Flight
+
         try:
             return Flight.objects.get(pk=flight_id)
         except Flight.DoesNotExist:

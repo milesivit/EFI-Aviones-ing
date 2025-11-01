@@ -40,10 +40,10 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "airline",
     "home",
-    'drf_spectacular',
-    #api
-    'rest_framework',
-    'api'
+    "drf_spectacular",
+    # api
+    "rest_framework",
+    "api",
 ]
 
 MIDDLEWARE = [
@@ -144,32 +144,28 @@ AUTH_USER_MODEL = "airline.User"
 REST_FRAMEWORK = {
     # Use Django's standard `django.contrib.auth` permissions,
     # or allow read-only access for unauthenticated users.
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.AllowAny'
-    ],
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 2,
-    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    "DEFAULT_PERMISSION_CLASSES": ["rest_framework.permissions.AllowAny"],
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
+    "PAGE_SIZE": 2,
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
 
 SPECTACULAR_SETTINGS = {
-    'TITLE': 'API VIRGIN ATLANTIC',
-    'DESCRIPTION': (        'API REST para la gestión de vuelos, pasajeros, reservas y tickets de la aerolínea Virgin Atlantic. '
-        'Incluye endpoints protegidos con autenticación JWT para usuarios registrados y personal autorizado. '
-        'Permite operaciones CRUD sobre vuelos, pasajeros, reservas y emisión de tickets, así como consultas '
-        'sobre asientos disponibles y reservas activas.'),
-    'VERSION': '1.0.8',
-    'SERVE_INCLUDE_SCHEMA': False,
-    'COMPONENT_SPLIT_REQUEST': True,
-    'SCHEMA_PATH_PREFIX': '/api/',
-    'SERVE_PERMISSIONS': ['rest_framework.permissions.AllowAny'],
-    'SECURITY_SCHEMES': {
-        'Bearer': {
-            'type': 'http',
-            'scheme': 'bearer',
-            'bearerFormat': 'Token'
-        }
-    }
+    "TITLE": "API VIRGIN ATLANTIC",
+    "DESCRIPTION": (
+        "API REST para la gestión de vuelos, pasajeros, reservas y tickets de la aerolínea Virgin Atlantic. "
+        "Incluye endpoints protegidos con autenticación JWT para usuarios registrados y personal autorizado. "
+        "Permite operaciones CRUD sobre vuelos, pasajeros, reservas y emisión de tickets, así como consultas "
+        "sobre asientos disponibles y reservas activas."
+    ),
+    "VERSION": "1.0.8",
+    "SERVE_INCLUDE_SCHEMA": False,
+    "COMPONENT_SPLIT_REQUEST": True,
+    "SCHEMA_PATH_PREFIX": "/api/",
+    "SERVE_PERMISSIONS": ["rest_framework.permissions.AllowAny"],
+    "SECURITY_SCHEMES": {
+        "Bearer": {"type": "http", "scheme": "bearer", "bearerFormat": "Token"}
+    },
 }
 
 VALID_TOKENS = "token-valido-1234"

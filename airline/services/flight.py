@@ -1,4 +1,6 @@
-from airline.models import Flight #esta bien el modelo aca ya que El Service solo recibe o devuelve objetos y llama al Repository para hacer el trabajo real.
+from airline.models import (
+    Flight,
+)  # esta bien el modelo aca ya que El Service solo recibe o devuelve objetos y llama al Repository para hacer el trabajo real.
 from airline.repositories.flight import FlightRepository
 
 from datetime import datetime, timedelta
@@ -48,10 +50,10 @@ class FlightService:
         base_price: float,
         plane_id: int,
         user_ids: list[int],
-    ) -> Flight: 
+    ) -> Flight:
         return FlightRepository.update(
-            flight=flight, 
-            origin=origin, 
+            flight=flight,
+            origin=origin,
             destination=destination,
             departure_date=departure_date,
             arrival_date=arrival_date,
@@ -59,8 +61,8 @@ class FlightService:
             status=status,
             base_price=base_price,
             plane_id=plane_id,
-            user_id=user_ids
-            )
+            user_id=user_ids,
+        )
 
     @staticmethod
     def get_all() -> list[Flight]:
@@ -87,7 +89,7 @@ class FlightService:
             flight for flight in all_flights if flight.departure_date.date() >= today
         ]
         return upcoming_flights
-    
+
     @staticmethod
     def filter_flights(origin=None, destination=None, date=None):
         """

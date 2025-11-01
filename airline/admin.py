@@ -44,6 +44,7 @@ class FlightStatusAdmin(admin.ModelAdmin):
     # Columnas visibles en la lista de estados de vuelo
     list_display = ("id", "status")
 
+
 # Registro del modelo Flight en el panel de administración de Django
 @admin.register(Flight)
 class FlightAdmin(admin.ModelAdmin):
@@ -78,6 +79,7 @@ class PassengerAdmin(admin.ModelAdmin):
     # Campos que podrán ser buscados mediante la barra de búsqueda
     search_fields = ("name", "document", "email")
 
+
 # Registro del modelo Seat en el panel de administración de Django
 @admin.register(Seat)
 class SeatAdmin(admin.ModelAdmin):
@@ -109,11 +111,12 @@ class ReservationAdmin(admin.ModelAdmin):
     # Campos que podrán ser buscados mediante la barra de búsqueda
     search_fields = (
         "reservation_code",
-        "passenger__name",      # Búsqueda por nombre del pasajero relacionado
-        "flight__origin",       # Búsqueda por origen del vuelo relacionado
+        "passenger__name",  # Búsqueda por nombre del pasajero relacionado
+        "flight__origin",  # Búsqueda por origen del vuelo relacionado
         "flight__destination",  # Búsqueda por destino del vuelo relacionado
-        "user__username",       # Búsqueda por nombre de usuario del creador de la reserva
+        "user__username",  # Búsqueda por nombre de usuario del creador de la reserva
     )
+
 
 # Registro del modelo Ticket en el panel de administración de Django
 @admin.register(Ticket)
@@ -124,6 +127,6 @@ class TicketAdmin(admin.ModelAdmin):
     list_filter = ("status", "issue_date")
     # Campos que podrán ser buscados mediante la barra de búsqueda
     search_fields = (
-        "barcode",                        # Búsqueda por código de barras del ticket
+        "barcode",  # Búsqueda por código de barras del ticket
         "reservation__reservation_code",  # Búsqueda por código de reserva relacionado
     )

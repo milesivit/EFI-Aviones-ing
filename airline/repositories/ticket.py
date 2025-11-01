@@ -61,7 +61,7 @@ class TicketRepository:
     @staticmethod
     def search_by_barcode(barcode: str) -> list[Ticket]:
         return Ticket.objects.filter(barcode__icontains=barcode)
-    
+
     @staticmethod
     def get_ticket_by_barcode(barcode: str) -> Ticket | None:
         try:

@@ -1,7 +1,11 @@
-from airline.models import Seat, Flight #esta bien el modelo aca ya que El Service solo recibe o devuelve objetos y llama al Repository para hacer el trabajo real.
+from airline.models import (
+    Seat,
+    Flight,
+)  # esta bien el modelo aca ya que El Service solo recibe o devuelve objetos y llama al Repository para hacer el trabajo real.
 from airline.repositories.seat import SeatRepository
 from airline.repositories.flight import FlightRepository
 from typing import List
+
 
 class SeatService:
 
@@ -67,11 +71,11 @@ class SeatService:
         if number:
             return SeatRepository.search_by_number(number=number)
         return ValueError("El Asiento No Existe")
-    
+
     @staticmethod
     def mark_as_taken(seat_id: int) -> Seat:
         return SeatRepository.mark_as_taken(seat_id)
-    
+
     @staticmethod
     def get_available_seats_by_flight(flight_id: int) -> List[Seat]:
         flight = FlightRepository.get_by_id(flight_id)
@@ -80,7 +84,7 @@ class SeatService:
 
         plane_id = flight.plane.id
         return SeatRepository.get_available_by_plane(plane_id)
-    
+
     @staticmethod
     def check_availability(plane_id: int, seat_code: str):
         seat = SeatRepository.get_seat_by_plane_and_code(plane_id, seat_code)

@@ -1,4 +1,6 @@
-from airline.models import FlightStatus #esta bien el modelo aca ya que El Service solo recibe o devuelve objetos y llama al Repository para hacer el trabajo real.
+from airline.models import (
+    FlightStatus,
+)  # esta bien el modelo aca ya que El Service solo recibe o devuelve objetos y llama al Repository para hacer el trabajo real.
 from airline.repositories.flight_status import FlightStatusRepository
 
 
@@ -15,7 +17,7 @@ class FlightStatusService:
         if flight_status:
             return FlightStatusRepository.delete(flight_status=flight_status)
         return False
-    
+
     @staticmethod
     def update(flight_status: FlightStatus, status: str) -> FlightStatus:
         return FlightStatusRepository.update(flight_status=flight_status, status=status)
@@ -26,8 +28,9 @@ class FlightStatusService:
 
     @staticmethod
     def get_by_id(flight_status_id: int) -> FlightStatus:
-        flight_status = FlightStatusRepository.get_by_id(flight_status_id=flight_status_id)
+        flight_status = FlightStatusRepository.get_by_id(
+            flight_status_id=flight_status_id
+        )
         if not flight_status:
             raise ValueError("El Estado de Vuelo No Existe")
         return flight_status
-

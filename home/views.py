@@ -1,6 +1,10 @@
-from django.shortcuts import render, redirect  # Funciones para renderizar plantillas y redirigir
+from django.shortcuts import (
+    render,
+    redirect,
+)  # Funciones para renderizar plantillas y redirigir
 from django.views import View  # Clase base para vistas basadas en clases (CBV)
 from django.contrib.auth import logout  # Función para cerrar sesión de usuarios
+
 
 # Vista para la página de inicio
 class HomeView(View):

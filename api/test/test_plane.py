@@ -13,9 +13,7 @@ def admin_client(db):
     con permisos de administrador.
     """
     admin_user = User.objects.create_superuser(
-        username="admin",
-        email="admin@test.com",
-        password="admin123"
+        username="admin", email="admin@test.com", password="admin123"
     )
     client = APIClient()
     client.force_authenticate(user=admin_user)
@@ -28,12 +26,7 @@ def test_create_plane(admin_client):
     """
     Verifica que se pueda crear un avión correctamente mediante POST.
     """
-    payload = {
-        "model": "Boeing 737",
-        "capacity": 180,
-        "rows": 30,
-        "columns": 6
-    }
+    payload = {"model": "Boeing 737", "capacity": 180, "rows": 30, "columns": 6}
 
     url = reverse("plane-vs-list")
     response = admin_client.post(url, payload, format="json")
@@ -98,12 +91,7 @@ def test_plane_update_put(admin_client):
     """
     plane = Plane.objects.create(model="Boeing 737", capacity=180, rows=30, columns=6)
 
-    payload = {
-        "model": "Boeing 737 MAX",
-        "capacity": 200,
-        "rows": 33,
-        "columns": 6
-    }
+    payload = {"model": "Boeing 737 MAX", "capacity": 200, "rows": 33, "columns": 6}
 
     url = reverse("plane-vs-detail", args=[plane.pk])
     response = admin_client.put(url, payload, format="json")

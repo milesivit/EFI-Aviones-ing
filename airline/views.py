@@ -10,7 +10,12 @@ from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 
 # Modelos internos de la aplicación
-from airline.models import Flight, Plane, Reservation, Seat #TODO ARREGLAR ESTO Q NO LE PEGUE AL MODELO
+from airline.models import (
+    Flight,
+    Plane,
+    Reservation,
+    Seat,
+)  # TODO ARREGLAR ESTO Q NO LE PEGUE AL MODELO
 
 # Formularios internos
 from airline.forms import (

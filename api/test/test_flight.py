@@ -5,6 +5,7 @@ from airline.models import Flight, FlightStatus, Plane, User
 from datetime import datetime
 from django.utils import timezone
 
+
 # -------------------- FIXTURE: Cliente autenticado como admin --------------------
 @pytest.fixture
 def admin_client(db):
@@ -12,9 +13,7 @@ def admin_client(db):
     Crea un superusuario autenticado para las pruebas.
     """
     admin_user = User.objects.create_superuser(
-        username="admin",
-        email="admin@test.com",
-        password="admin123"
+        username="admin", email="admin@test.com", password="admin123"
     )
     client = APIClient()
     client.force_authenticate(user=admin_user)
@@ -33,9 +32,7 @@ def flight_dependencies(db):
     status = FlightStatus.objects.create(status="Scheduled")
     plane = Plane.objects.create(model="Boeing 737", capacity=180, rows=30, columns=6)
     passenger = User.objects.create_user(
-        username="passenger1",
-        email="p1@test.com",
-        password="123"
+        username="passenger1", email="p1@test.com", password="123"
     )
     return {"status": status, "plane": plane, "user": passenger}
 

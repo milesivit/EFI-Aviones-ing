@@ -1,5 +1,7 @@
 from datetime import date
-from airline.models import Passenger #esta bien el modelo aca ya que El Service solo recibe o devuelve objetos y llama al Repository para hacer el trabajo real.
+from airline.models import (
+    Passenger,
+)  # esta bien el modelo aca ya que El Service solo recibe o devuelve objetos y llama al Repository para hacer el trabajo real.
 from airline.repositories.passenger import PassengerRepository
 
 
@@ -72,6 +74,6 @@ class PassengerService:
     def get_active_reservations(passenger_id: int):
         passenger = PassengerRepository.get_passenger_by_id(passenger_id)
         if not passenger:
-            return None  
+            return None
 
         return PassengerRepository.get_active_reservations(passenger)

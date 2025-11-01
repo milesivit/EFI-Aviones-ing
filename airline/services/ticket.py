@@ -1,5 +1,7 @@
 from datetime import datetime
-from airline.models import Ticket #esta bien el modelo aca ya que El Service solo recibe o devuelve objetos y llama al Repository para hacer el trabajo real.
+from airline.models import (
+    Ticket,
+)  # esta bien el modelo aca ya que El Service solo recibe o devuelve objetos y llama al Repository para hacer el trabajo real.
 from airline.repositories.ticket import TicketRepository
 from airline.repositories.reservation import ReservationRepository
 
@@ -87,7 +89,7 @@ class TicketService:
         if tickets:
             return tickets
         raise ValueError("No se encontraron tickets con ese código de barras")
-    
+
     @staticmethod
     def get_ticket_info(barcode: str):
         ticket = TicketRepository.get_ticket_by_barcode(barcode)

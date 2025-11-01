@@ -18,6 +18,7 @@ from airline.services.seat import SeatService
 from airline.services.reservation import ReservationService
 from airline.services.ticket import TicketService
 
+
 class PlaneSerializer(serializers.ModelSerializer):
     """
     Serializer del modelo Plane.
@@ -53,6 +54,7 @@ class PlaneSerializer(serializers.ModelSerializer):
             columns=validated_data.get("columns", instance.columns),
         )
         return plane
+
 
 class FlightStatusSerializer(serializers.ModelSerializer):
     """
@@ -102,7 +104,9 @@ class FlightSerializer(serializers.ModelSerializer):
     # Campos de salida (para GET)
     status_display = serializers.StringRelatedField(source="status", read_only=True)
     plane_display = serializers.StringRelatedField(source="plane", read_only=True)
-    user_display = serializers.StringRelatedField(source="user", many=True, read_only=True)
+    user_display = serializers.StringRelatedField(
+        source="user", many=True, read_only=True
+    )
 
     class Meta:
         model = Flight
@@ -155,7 +159,9 @@ class FlightSerializer(serializers.ModelSerializer):
             flight=instance,
             origin=validated_data.get("origin", instance.origin),
             destination=validated_data.get("destination", instance.destination),
-            departure_date=validated_data.get("departure_date", instance.departure_date),
+            departure_date=validated_data.get(
+                "departure_date", instance.departure_date
+            ),
             arrival_date=validated_data.get("arrival_date", instance.arrival_date),
             duration=validated_data.get("duration", instance.duration),
             status=status.id,
@@ -267,7 +273,8 @@ class SeatSerializer(serializers.ModelSerializer):
             status=validated_data.get("status", instance.status),
             plane_id=validated_data.get("plane", instance.plane).id,
         )
-    
+
+
 class UserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=True)
 
@@ -330,7 +337,9 @@ class ReservationSerializer(serializers.ModelSerializer):
 
     # Para GET -> se muestra la información completa
     flight_display = serializers.StringRelatedField(source="flight", read_only=True)
-    passenger_display = serializers.StringRelatedField(source="passenger", read_only=True)
+    passenger_display = serializers.StringRelatedField(
+        source="passenger", read_only=True
+    )
     seat_display = serializers.StringRelatedField(source="seat", read_only=True)
     user_display = serializers.StringRelatedField(source="user", read_only=True)
 
@@ -374,14 +383,19 @@ class ReservationSerializer(serializers.ModelSerializer):
         return ReservationService.update(
             reservation_id=instance.id,
             status=validated_data.get("status", instance.status),
-            reservation_date=validated_data.get("reservation_date", instance.reservation_date),
+            reservation_date=validated_data.get(
+                "reservation_date", instance.reservation_date
+            ),
             price=validated_data.get("price", instance.price),
-            reservation_code=validated_data.get("reservation_code", instance.reservation_code),
+            reservation_code=validated_data.get(
+                "reservation_code", instance.reservation_code
+            ),
             flight_id=validated_data.get("flight", instance.flight).id,
             passenger_id=validated_data.get("passenger", instance.passenger).id,
             seat_id=validated_data.get("seat", instance.seat).id,
             user_id=validated_data.get("user", instance.user).id,
         )
+
 
 class TicketSerializer(serializers.ModelSerializer):
     """
@@ -396,7 +410,9 @@ class TicketSerializer(serializers.ModelSerializer):
     )
 
     # Para GET -> se muestra la información expandida
-    reservation_display = serializers.StringRelatedField(source="reservation", read_only=True)
+    reservation_display = serializers.StringRelatedField(
+        source="reservation", read_only=True
+    )
 
     class Meta:
         model = Ticket

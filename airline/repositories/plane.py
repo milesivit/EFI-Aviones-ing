@@ -118,7 +118,7 @@ class PlaneRepository:
             return Plane.objects.filter(model__icontains=model)
         except Plane.DoesNotExist:
             return None
-        
+
     @staticmethod
     def get_plane_by_id(plane_id: int) -> Plane | None:
         try:

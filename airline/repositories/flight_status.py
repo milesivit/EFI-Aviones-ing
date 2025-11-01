@@ -29,7 +29,6 @@ class FlightStatusRepository:
         flight_status.delete()
         return True
 
-
     @staticmethod
     def update(flight_status: FlightStatus, status: str) -> FlightStatus:
         """
@@ -38,7 +37,6 @@ class FlightStatusRepository:
         flight_status.status = status
         flight_status.save()
         return flight_status
-
 
     @staticmethod
     def get_all() -> list[FlightStatus]:
