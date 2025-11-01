@@ -27,7 +27,11 @@ python manage.py migrate
 ```bash
 python manage.py createsuperuser
 ```
-## 6️⃣ Levantar el servidor
+## 6️⃣ Json para datos en la DB
+```bash
+ python manage.py loaddata airline/fixtures/initial_data.json
+```
+## 7️⃣ Levantar el servidor
 ```bash
 python manage.py runserver
 ```
