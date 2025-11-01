@@ -614,6 +614,7 @@ def upcoming_flight_list(request):
 def flight_administration(request):
     # Obtiene todos los vuelos usando FlightService
     flights = FlightService.get_all()
+    user = UserService.get_by_id(user_id=user)
 
     # Inicializa el formulario para crear un nuevo vuelo
     form = CreateFlightForm()
@@ -641,7 +642,8 @@ def flight_administration(request):
                     duration=cd["arrival_date"] - cd["departure_date"],
                     base_price=cd["base_price"],
                     status=cd["status_id"],
-                    plane=cd["plane_id"],
+                    plane_id=cd["plane_id"],
+                    user_id=cd["user"],
                 )
                 return redirect("flight_administration")  # Redirige a la misma vista
             else:
