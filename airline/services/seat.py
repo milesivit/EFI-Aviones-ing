@@ -81,13 +81,13 @@ class SeatService:
         Crea los asientos de un avión en masa.
         """
         seats = []
-        for row in rows:
-            for col in columns:
+        for row in range(plane.rows):
+            for col in range (plane.columns):
                 seats.append(
                     Seat(
                         number=f"{row}{col}",
-                        row=row,
-                        column=col,
+                        rows=row,
+                        columns=col,
                         seat_type=seat_type,
                         status="available",
                         plane=plane,
